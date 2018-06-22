@@ -1,7 +1,8 @@
 import express from 'express';
+import pigRoute from '../controllers/pigController';
 
-const router = express.Router(); // eslint-disable-line new-cap
+const router = express.Router();
 
-router.get('/', (req, res) => res.send('Hello World!'));
+router.use('/pig', pigRoute);
 
 export default router;

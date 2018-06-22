@@ -6,7 +6,17 @@ import nodemon from 'gulp-nodemon';
 import path from 'path';
 
 const paths = {
-  js: ['config/**/*.js', 'route/*.js', 'helper/*.js', './index.js', '!dist/**', '!node_modules/**'],
+  js: [
+    'config/**/*.js',
+    'controllers/**/*.js',
+    'businessLogic/**/*.js',
+    'dataAccess/**/*.js',
+    'route/*.js',
+    'helper/*.js',
+    './index.js',
+    '!dist/**',
+    '!node_modules/**',
+  ],
 };
 
 // Clean up dist and coverage directory
@@ -31,4 +41,4 @@ gulp.task('run', () => {
 });
 
 // default task: clean dist, compile js files and copy non-js files, run server
-gulp.task('default', gulp.series(['clean', 'babel', 'run']));
+gulp.task('default', gulp.series(['clean', 'babel']));
