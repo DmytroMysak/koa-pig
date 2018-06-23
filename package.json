@@ -6,9 +6,10 @@
   "author": "Dmytro Mysak",
   "license": "MIT",
   "scripts": {
+    "build": "gulp",
     "start-dev": "gulp run",
-    "start": "gulp build && better-npm-run start-prod",
-    "start-dev-pm2": "gulp build && better-npm-run start-dev"
+    "start": "gulp && better-npm-run start-prod",
+    "start-dev-pm2": "gulp && better-npm-run start-dev"
   },
   "betterScripts": {
     "start-prod": {
@@ -41,7 +42,10 @@
     "helmet": "^3.12.1",
     "lodash": "^4.17.10",
     "moment": "^2.22.1",
+    "p-queue": "^2.4.2",
+    "play-sound": "^1.1.2",
     "pm2": "^2.10.4",
+    "sequelize": "^4.38.0",
     "winston": "^2.4.2"
   },
   "devDependencies": {

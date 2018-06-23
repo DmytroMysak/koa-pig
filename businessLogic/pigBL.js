@@ -1,43 +1,64 @@
 import _ from 'lodash';
+import moment from 'moment';
+import path from 'path';
 import Polly from './awsBL';
-import * as pigDao from '../dataAccess/pigDAO';
-import * as queueBL from './queueBL';
+import Audio from './audioBL';
+import { models } from '../models/index';
+import VoicesDao from '../dataAccess/VoicesDao';
+import ChatDataDao from '../dataAccess/ChatDataDao';
+import AudioDataDao from '../dataAccess/AudioDataDao';
+import Queue from './queueBL';
+import config from '../config/env';
 
-export const pigSpeak = (text, voiceId) => {
-  const params = {
-    OutputFormat: 'mp3',
-    Text: text,
-    VoiceId: voiceId,
-  };
+const { audioData: AudioDataModel } = models;
 
-  return Promise.all([
-    Polly.synthesizeSpeech(params).promise(),
-    pigDao.saveText('mac', text),
-  ])
-    .then(([data]) => queueBL.addToQueue(data));
-};
+export default class PigService {
+  constructor() {
+    this.voicesDao = new VoicesDao(models);
+    this.chatDataDao = new ChatDataDao(models);
+    this.audioDataDao = new AudioDataDao(models);
+    this.queue = new Queue();
+    this.audio = new Audio();
+  }
 
-export const getLanguagesList = (unique) => {
-  // todo get from db, if empty get from aws and save to db
-  return Polly.describeVoices()
-    .promise()
-    .then((voiceList) => {
-      const voices = voiceList.Voices.map(voice => ({ name: voice.LanguageName, code: voice.LanguageCode }));
+  pigSpeak(chatData) {
+    const params = {
+      OutputFormat: 'mp3',
+      Text: chatData.get('text'),
+      VoiceId: chatData.get('voiceId'),
+    };
+    const pathToFile = path.normalize(
+      `${__dirname}/../../${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}`,
+    );
 
-      return (!unique && voices) || _.uniqBy(voices, voice => `${voice.name}${voice.code}`);
-    });
-};
+    return Promise.all([
+      this.audioDataDao.getAudioDataByText({ text: chatData.get('text') }),
+      AudioDataModel.build({ voiceId: chatData.get('voiceId'), pathToFile }).validate(),
+      this.chatDataDao.saveChatData(chatData),
+    ])
+      .then(([audioData, newAudioData]) => Promise.all(!_.isEmpty(audioData) ? [audioData] : [
+        this.audioDataDao.saveAudioData(newAudioData),
+        Polly.synthesizeSpeech(params).promise(),
+        this.chatDataDao.updateChatData(chatData.id, { audioId: newAudioData.id }, ['audioId']),
+      ]))
+      .then(([audioData, audioStream]) => Promise.all([
+        audioData,
+        _.isEmpty(audioStream) ? {} : this.audio.saveStreamToFile(audioData, audioStream),
+      ]))
+      .then(([audioData]) => this.queue.addToQueue(audioData));
+  }
 
-export const getVoicesList = (languageCode = null) => {
-  // todo get from db, if empty get from aws and save to db
-  return Polly.describeVoices(...languageCode ? { LanguageCode: languageCode } : {})
-    .promise()
-    .then(data => data.Voices);
-};
+  getLanguagesList(unique) {
+    return this.voicesDao.getVoices(unique)
+      .then(voices => voices.map(voice => ({ name: voice.languageName, code: voice.languageCode })));
+  }
 
-export const getSpeakersNameList = (id = null) => {
-  // todo get from db, if empty get from aws and save to db
-  return Polly.describeVoices(...id ? { LanguageCode: id } : {})
-    .promise()
-    .then(voiceList => voiceList.Voices.map(voice => ({ name: voice.Name, id: voice.Id, gender: voice.Gender })));
-};
+  getVoicesList(languageCode = null) {
+    return this.voicesDao.getVoices(false, ...languageCode ? { languageCode } : {});
+  }
+
+  getSpeakersNameList(id = null) {
+    return this.voicesDao.getVoices(false, ...id ? { languageCode: id } : {})
+      .then(voices => voices.map(voice => ({ name: voice.name, id: voice.id, gender: voice.gender })));
+  }
+}

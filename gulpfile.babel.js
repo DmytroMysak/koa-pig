@@ -11,6 +11,7 @@ const paths = {
     'controllers/**/*.js',
     'businessLogic/**/*.js',
     'dataAccess/**/*.js',
+    'models/**/*.js',
     'route/*.js',
     'helper/*.js',
     './index.js',

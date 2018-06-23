@@ -24,7 +24,7 @@ export const options = {
     level: 'debug',
     timestamp: tsFormat,
     handleExceptions: true,
-    json: false,
+    json: true,
     colorize: true,
   },
 };

@@ -1,13 +1,17 @@
 import express from 'express';
-import * as pigBL from '../businessLogic/pigBL';
+import PigService from '../businessLogic/pigBL';
 import validator from '../helper/validator';
+import { models } from '../models';
 
 const router = express.Router();
+const pigBL = new PigService();
+const { chatData: ChatDataModel } = models;
 
 router.post('/say', (req, res, next) => {
   const { text, voiceId } = req.body;
-
-  return pigBL.pigSpeak(text, voiceId)
+  return ChatDataModel.build({ text, voiceId, userId: req.user.id })
+    .validate()
+    .then(chatData => pigBL.pigSpeak(chatData))
     .then(result => res.json(result))
     .catch(error => next(error));
 });

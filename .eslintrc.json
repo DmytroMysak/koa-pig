@@ -4,7 +4,7 @@
     "function-paren-newline": "off",
     "max-len": [
       2,
-      120
+      125
     ]
   }
 }

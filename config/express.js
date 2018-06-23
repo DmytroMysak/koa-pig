@@ -6,8 +6,7 @@ import bodyParser from 'body-parser';
 import winston from 'winston';
 import expressWinston from 'express-winston';
 import routes from '../route';
-import { options } from '../helper/logger';
-import logger from '../helper/logger';
+import logger, { options } from '../helper/logger';
 
 const app = express();
 
