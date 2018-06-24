@@ -1,14 +1,23 @@
+import encoding from 'encoding';
 import axios from 'axios';
 import PigService from './pigBL';
+import UserDao from '../dataAccess/UserDao';
 import { models } from '../models';
 import config from '../config/env';
+import logger from '../helper/logger';
 
 const { chatData: ChatDataModel } = models;
 
 export default class BotService {
   constructor() {
+    axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
+    this.axios = axios.create({
+      baseURL: 'https://graph.facebook.com/v3.0/me',
+    });
     this.pigService = new PigService();
+    this.userDao = new UserDao(models);
   }
+
   handleMessage(message, user) {
     const { text } = message;
     return ChatDataModel.build({ text, voiceId: user.selectedVoiceId || config.defaultVoiceId, userId: user.id })
@@ -17,58 +26,94 @@ export default class BotService {
   }
 
   handlePostBack(postback, user) {
-    let response;
+    const prefixToVoiceChangePayload = 'CHANGE_VOICE_ID_FOR_CURRENT_USER_TO_';
+    const prefixToLanguagePayload = 'SELECTED_LANGUAGE_IS_';
 
-    // Получим данные postback-уведомления
-    let payload = received_postback.payload;
+    if (postback.payload === 'LANGUAGE_LIST') {
+      return this.pigService.getLanguagesList(true)
+        .then((languageList) => {
+          const [list, chuckSize] = [languageList.rows, 10];
+          const array = new Array(Math.ceil(list.length / chuckSize)).fill().map(() => list.splice(0, chuckSize));
+          return array.map(languages => ({
+            attachment: {
+              type: 'template',
+              payload: {
+                template_type: 'button',
+                text: 'Select language',
+                buttons: languages.map(language => ({
+                  type: 'postback',
+                  title: language.name,
+                  payload: `${prefixToLanguagePayload}${language.code}`,
+                })),
+              },
+            },
+          }));
+        })
+        .then(responses => Promise.all(responses.map(response => this.sendResponseToFb(user.facebookId, response))))
+        .catch(error => logger.info(error));
+    }
 
-    // Сформируем ответ, основанный на данных уведомления
-    if (payload === 'CAT_PICS') {
-      response = imageTemplate('cats', sender_psid);
-      callSendAPI(sender_psid, response, function(){
-        callSendAPI(sender_psid, askTemplate('Show me more'));
-      });
-    } else if (payload === 'DOG_PICS') {
-      response = imageTemplate('dogs', sender_psid);
-      callSendAPI(sender_psid, response, function(){
-        callSendAPI(sender_psid, askTemplate('Show me more'));
-      });
-    } else if(payload === 'GET_STARTED'){
-      response = askTemplate('Are you a Cat or Dog Person?');
-      callSendAPI(sender_psid, response);
+    if (postback.payload.includes(prefixToLanguagePayload)) {
+      const languageId = postback.payload.replace(prefixToLanguagePayload, '');
+      return this.pigService.getVoicesList(languageId)
+        .then(voices => ({
+          attachment: {
+            type: 'template',
+            payload: {
+              template_type: 'button',
+              text: 'Select language',
+              buttons: voices.rows.map(voice => ({
+                type: 'postback',
+                title: voice.name,
+                payload: `${prefixToVoiceChangePayload}${voice.languageCode}`,
+              })),
+            },
+          },
+        }))
+        .then(response => this.sendResponseToFb(user.facebookId, response));
+    }
+
+    if (postback.payload.includes(prefixToVoiceChangePayload)) {
+      const voiceId = postback.payload.replace(prefixToVoiceChangePayload, '');
+      return this.userDao.updateUserVoiceId(user.id, voiceId)
+        .then(() => this.sendResponseToFb(user.id, { text: 'Voice changed' }));
+    }
+
+    if (postback.payload === 'CURRENT_VOICE') {
+      return this.sendResponseToFb(user.facebookId, { text: user.voices ? user.voices.name : config.defaultVoiceId });
     }
   }
 
-  sendResponseToFb(sender_psid, response, cb = null) {
-    axios.get('/user?ID=12345')
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    // Конструируем тело сообщения
-    let request_body = {
-      "recipient": {
-        "id": sender_psid
-      },
-      "message": response
-    };
+  sendResponseToFb(userFacebookId, response) {
+    return this.axios.post(`/messages?access_token=${config.accessToken}`, {
+      messaging_type: 'RESPONSE',
+      recipient: { id: userFacebookId },
+      message: response,
+    })
+      .then(res => logger.info(res))
+      .catch(error => logger.info(error));
+  }
 
-    // Отправляем HTTP-запрос к Messenger Platform
-    request({
-      "uri": "https://graph.facebook.com/v2.6/me/messages",
-      "qs": { "access_token": config.get('facebook.page.access_token') },
-      "method": "POST",
-      "json": request_body
-    }, (err, res, body) => {
-      if (!err) {
-        if(cb){
-          cb();
-        }
-      } else {
-        console.error("Unable to send message:" + err);
-      }
+  addPersistentMenu() {
+    return this.axios.post(`/messenger_profile?access_token=${config.accessToken}`, {
+      persistent_menu: [
+        {
+          locale: 'default',
+          composer_input_disabled: false,
+          call_to_actions: [
+            {
+              title: 'Change voice',
+              type: 'postback',
+              payload: 'LANGUAGE_LIST',
+            },
+            {
+              title: 'Selected voice',
+              type: 'postback',
+              payload: 'CURRENT_VOICE',
+            },
+          ],
+        },
+      ],
     });
   }
 }

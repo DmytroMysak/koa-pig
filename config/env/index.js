@@ -20,6 +20,7 @@ const defaults = {
   folderToSaveLogs: 'logs',
   songFormat: 'mp3',
   verifyToken: process.env.FB_VERITY_TOKEN,
+  accessToken: process.env.FB_ACCESS_TOKEN,
   defaultVoiceId: 'Maxim',
 };
 

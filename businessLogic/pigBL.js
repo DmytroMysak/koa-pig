@@ -60,7 +60,10 @@ export default class PigService {
 
   getLanguagesList(unique) {
     return this.voicesDao.getVoices(unique)
-      .then(voices => voices.map(voice => ({ name: voice.languageName, code: voice.languageCode })));
+      .then(data => ({
+        rows: data.rows.map(voice => ({ name: voice.languageName, code: voice.languageCode })),
+        count: data.count,
+      }));
   }
 
   getVoicesList(languageCode = null) {
@@ -69,6 +72,9 @@ export default class PigService {
 
   getSpeakersNameList(id = null) {
     return this.voicesDao.getVoices(false, ...id ? { languageCode: id } : {})
-      .then(voices => voices.map(voice => ({ name: voice.name, id: voice.id, gender: voice.gender })));
+      .then(data => ({
+        rows: data.rows.map(voice => ({ name: voice.name, id: voice.id, gender: voice.gender })),
+        count: data.count,
+      }));
   }
 }

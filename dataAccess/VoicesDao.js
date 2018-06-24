@@ -11,7 +11,10 @@ export default class VoicesDao {
 
   getVoices(unique = false, filter = null) {
     return this.voices.findAndCountAll({
+      ...unique ? { attributes: ['languageName', 'languageCode'] } : {},
+      ...unique ? { group: ['languageName', 'languageCode'] } : {},
       distinct: unique,
+      col: 'languageCode',
       ..._.isEmpty(filter) ? {} : { where: filter },
     });
   }

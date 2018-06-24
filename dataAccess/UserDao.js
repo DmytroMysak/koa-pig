@@ -1,6 +1,7 @@
 export default class UserDao {
   constructor(models) {
     this.users = models.users;
+    this.voices = models.voices;
   }
 
   addUser(voice) {
@@ -10,6 +11,18 @@ export default class UserDao {
   getUserByFacebookId(facebookId) {
     return this.users.findOne({
       where: { facebookId },
+      include: [{ model: this.voices, required: false }],
     });
+  }
+
+  updateUserVoiceId(userId, voiceId) {
+    return this.users.update(
+      { selectedVoiceId: voiceId },
+      {
+        fields: ['selectedVoiceId'],
+        where: { id: userId },
+        returning: true,
+      },
+    );
   }
 }
