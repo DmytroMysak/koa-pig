@@ -19,6 +19,8 @@ const defaults = {
   folderToSaveSongs: 'songs',
   folderToSaveLogs: 'logs',
   songFormat: 'mp3',
+  verifyToken: process.env.FB_VERITY_TOKEN,
+  defaultVoiceId: 'Maxim',
 };
 
 export default Object.assign(defaults, config.default);

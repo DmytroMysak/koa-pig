@@ -22,10 +22,11 @@ export default class Audio {
   }
 
   playSong(audioData) {
-    return this.player.play(audioData.pathToFile, (err) => {
+    return new Promise((resolve, reject) => this.player.play(audioData.pathToFile, (err) => {
       if (err) {
-        throw err;
+        reject(err);
       }
-    });
+      resolve();
+    }));
   }
 }

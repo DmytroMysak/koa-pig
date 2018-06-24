@@ -7,9 +7,9 @@ export default class UserDao {
     return this.users.create(voice);
   }
 
-  getUserByMac(mac) {
+  getUserByFacebookId(facebookId) {
     return this.users.findOne({
-      where: { mac },
+      where: { facebookId },
     });
   }
 }

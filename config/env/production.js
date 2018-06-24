@@ -1,4 +1,4 @@
 export default {
   env: 'production',
-  port: process.env.PORT || 4000,
+  port: process.env.PORT || 80,
 };

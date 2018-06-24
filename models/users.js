@@ -9,9 +9,13 @@ export default (sequelize, DataTypes) => {
         unique: true,
         defaultValue: sequelize.literal('uuid_generate_v4()'),
       },
-      mac: {
+      facebookId: {
         type: DataTypes.STRING(50),
         allowNull: false,
+      },
+      selectedVoiceId: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
       },
       name: {
         type: DataTypes.STRING(100),
@@ -25,6 +29,7 @@ export default (sequelize, DataTypes) => {
   );
   users.associate = (models) => {
     users.hasMany(models.chatData, { foreignKey: 'userId' });
+    users.belongsTo(models.voices, { foreignKey: 'selectedVoiceId' });
   };
   return users;
 };
