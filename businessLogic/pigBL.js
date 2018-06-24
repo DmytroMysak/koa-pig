@@ -28,24 +28,34 @@ export default class PigService {
       VoiceId: chatData.get('voiceId'),
     };
     const pathToFile = path.normalize(
-      `${__dirname}/../../${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}`,
+      `${__dirname}/../../${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`,
     );
 
-    return Promise.all([
-      this.audioDataDao.getAudioDataByText({ text: chatData.get('text') }),
-      AudioDataModel.build({ voiceId: chatData.get('voiceId'), pathToFile }).validate(),
-      this.chatDataDao.saveChatData(chatData),
-    ])
-      .then(([audioData, newAudioData]) => Promise.all(!_.isEmpty(audioData) ? [audioData] : [
-        this.audioDataDao.saveAudioData(newAudioData),
-        Polly.synthesizeSpeech(params).promise(),
-        this.chatDataDao.updateChatData(chatData.id, { audioId: newAudioData.id }, ['audioId']),
-      ]))
-      .then(([audioData, audioStream]) => Promise.all([
-        audioData,
-        _.isEmpty(audioStream) ? {} : this.audio.saveStreamToFile(audioData, audioStream),
-      ]))
-      .then(([audioData]) => this.queue.addToQueue(audioData));
+    return this.audioDataDao.getAudioDataByText({ text: chatData.get('text') })
+      .then((audioData) => {
+        if (!_.isEmpty(audioData)) {
+          return [audioData];
+        }
+
+        return Promise.all([
+          AudioDataModel.build({ voiceId: chatData.get('voiceId'), pathToFile }).validate(),
+          Polly.synthesizeSpeech(params).promise(),
+        ]);
+      })
+      .then(([audioData, audioStream]) => {
+        if (_.isEmpty(audioStream)) {
+          return [audioData];
+        }
+
+        return Promise.all([
+          this.audioDataDao.saveAudioData(audioData.get()),
+          this.audio.saveStreamToFile(audioData.get(), audioStream),
+        ]);
+      })
+      .then(([audioData]) => Promise.all([
+        this.queue.addToQueue(audioData),
+        this.chatDataDao.saveChatData({ ...chatData.get(), audioId: audioData.get('id') }),
+      ]));
   }
 
   getLanguagesList(unique) {

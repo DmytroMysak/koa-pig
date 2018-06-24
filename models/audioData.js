@@ -14,7 +14,7 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
       },
       voiceId: {
-        type: DataTypes.DATE,
+        type: DataTypes.STRING(100),
         allowNull: false,
         defaultValue: sequelize.literal('now()'),
       },
@@ -26,6 +26,7 @@ export default (sequelize, DataTypes) => {
   );
   audioData.associate = (models) => {
     audioData.belongsTo(models.voices, { foreignKey: 'voiceId' });
+    // audioData.hasOne(models.chatData, { foreignKey: 'audioId' });
   };
   return audioData;
 };

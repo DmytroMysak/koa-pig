@@ -62,7 +62,7 @@ const sequelize = new Sequelize(config.pg.name, config.pg.username, config.pg.pa
 const models = {};
 
 fs.readdirSync(__dirname)
-  .filter(file => (file.indexOf('.') !== 0) && (file !== 'index.js'))
+  .filter(file => (path.extname(file) === '.js') && (file !== 'index.js'))
   .forEach((file) => {
     const model = sequelize.import(path.join(__dirname, file));
     models[model.name] = model;

@@ -11,22 +11,21 @@ const initialize = () => {
   const voicesDao = new VoicesDao(models);
   return Polly.describeVoices()
     .promise()
-    .then((voiceList) => {
+    .then((data) => {
       logger.info('voices initialized');
-      logger.info(voiceList);
+      logger.info(data);
 
-      return Promise.all([
-        voiceList
-          .map(voice => VoicesModel.build({
-            id: voice.Id,
-            gender: voice.Gender,
-            languageCode: voice.LanguageCode,
-            languageName: voice.LanguageName,
-            name: voice.Name,
-          }))
-          .map(voice => voice.validate()),
-      ])
-        .then(voices => voicesDao.saveVoices(voices));
+      return Promise.all(data.Voices
+        .map(voice => VoicesModel.build({
+          id: voice.Id,
+          gender: voice.Gender,
+          languageCode: voice.LanguageCode,
+          languageName: voice.LanguageName,
+          name: voice.Name,
+        }))
+        .map(voice => voice.validate()),
+      )
+        .then(voices => Promise.all(voices.map(voice => voicesDao.upsertVoice(voice.get()))));
     });
 };
 

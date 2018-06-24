@@ -3,11 +3,9 @@ import fs from 'fs';
 import moment from 'moment';
 import config from '../config/env';
 
-const logDir = 'logs';
-
 // Create the log directory if it does not exist
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
+if (!fs.existsSync(config.folderToSaveLogs)) {
+  fs.mkdirSync(config.folderToSaveLogs);
 }
 
 const tsFormat = () => moment().format('DD/MM/YYYY HH:mm:ss');
@@ -15,7 +13,7 @@ const tsFormat = () => moment().format('DD/MM/YYYY HH:mm:ss');
 export const options = {
   file: {
     level: config.env === 'development' ? 'debug' : 'info',
-    filename: `${logDir}/results.log`,
+    filename: `${config.folderToSaveLogs}/results.log`,
     handleExceptions: true,
     json: true,
     timestamp: tsFormat,

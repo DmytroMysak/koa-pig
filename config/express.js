@@ -7,6 +7,7 @@ import winston from 'winston';
 import expressWinston from 'express-winston';
 import routes from '../route';
 import logger, { options } from '../helper/logger';
+import userMiddleware from './middleware/userMiddleware';
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use(expressWinston.logger({
   colorize: true,
 }));
 
+app.use(userMiddleware);
 app.use('/', routes);
 app.use((req, res) => res.status(404).send('404 page'));
 

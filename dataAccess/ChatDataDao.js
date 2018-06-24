@@ -6,7 +6,7 @@ export default class ChatDataDao {
   }
 
   saveChatData(chatDataObject) {
-    return this.chatData.upsert(chatDataObject, { returning: true });
+    return this.chatData.create(chatDataObject, { returning: true });
   }
 
   updateChatData(id, chatDataObject, fieldsToUpdate = null) {

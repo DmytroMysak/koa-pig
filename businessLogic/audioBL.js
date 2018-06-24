@@ -1,19 +1,24 @@
 import Player from 'play-sound';
 import fs from 'fs';
-import logger from '../helper/logger';
-// import path from 'path';
-// import config from '../config/env';
+import config from '../config/env';
 
 export default class Audio {
   constructor() {
+    // Create the songs directory if it does not exist
+    if (!fs.existsSync(config.folderToSaveSongs)) {
+      fs.mkdirSync(config.folderToSaveSongs);
+    }
     this.player = new Player();
   }
 
   saveStreamToFile(audioData, stream) {
-    fs.createWriteStream(audioData.pathToFile)
-      .write(stream.AudioStream)
-      .on('finish', () => logger.info(`added file ${audioData.pathToFile}`))
-      .end();
+    return new Promise((resolve, reject) => {
+      const writeStream = fs.createWriteStream(audioData.pathToFile);
+      writeStream.end(stream.AudioStream);
+      writeStream
+        .on('finish', () => resolve())
+        .on('error', () => reject());
+    });
   }
 
   playSong(audioData) {
@@ -24,7 +29,3 @@ export default class Audio {
     });
   }
 }
-
-// const audio = new Audio();
-// const pathToFile = path.normalize(`${__dirname}/../../${config.folderToSaveSongs}/armata.mp3`);
-// audio.playSong({ pathToFile });

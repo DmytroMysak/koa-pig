@@ -12,7 +12,7 @@ router.post('/say', (req, res, next) => {
   return ChatDataModel.build({ text, voiceId, userId: req.user.id })
     .validate()
     .then(chatData => pigBL.pigSpeak(chatData))
-    .then(result => res.json(result))
+    .then(() => res.status(204).send())
     .catch(error => next(error));
 });
 

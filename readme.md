@@ -1,10 +1,11 @@
 Express-pig
 
-install mplayer
-sudo apt-get install mplayer
+for first time run in terminal:
+./initialize.sh
 
-Create a .env file in the root directory of your project.
-Add environment-specific variables on new lines in the form of NAME=VALUE:
-
+then change this 2 lines in .env file
 accessKeyId=<YOUR AWS accessKeyId>
 secretAccessKey=<YOUR AWS secretAccessKey>
+
+to start app enter:
+yarn start

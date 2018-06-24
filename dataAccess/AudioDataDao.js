@@ -13,9 +13,11 @@ export default class AudioDataDao {
 
   getAudioDataByText(filter) {
     return this.chatData.findOne({
-      ..._.isEmpty(filter) ? {} : { where: filter },
-      include: [this.audioData],
+      where: {
+        ..._.isEmpty(filter) ? {} : filter,
+      },
+      include: [{ model: this.audioData, as: 'audio', required: true }],
     })
-      .then(chatData => chatData.audioData);
+      .then(chatData => (_.isEmpty(chatData) && {}) || chatData.audio);
   }
 }

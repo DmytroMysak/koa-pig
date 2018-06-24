@@ -5,8 +5,8 @@ export default class VoicesDao {
     this.voices = models.voices;
   }
 
-  saveVoices(voices) {
-    return this.voices.create(voices);
+  upsertVoice(voice) {
+    return this.voices.upsert(voice);
   }
 
   getVoices(unique = false, filter = null) {
