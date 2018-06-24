@@ -15,6 +15,7 @@ export default class VoicesDao {
       ...unique ? { group: ['languageName', 'languageCode'] } : {},
       distinct: unique,
       col: 'languageCode',
+      order: [['languageName', 'asc']],
       ..._.isEmpty(filter) ? {} : { where: filter },
     });
   }

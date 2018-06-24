@@ -67,7 +67,10 @@ export default class PigService {
   }
 
   getVoicesList(languageCode = null) {
-    return this.voicesDao.getVoices(false, ...languageCode ? { languageCode } : {});
+    const filter = {
+      ...languageCode ? { languageCode } : {},
+    };
+    return this.voicesDao.getVoices(false, filter);
   }
 
   getSpeakersNameList(id = null) {

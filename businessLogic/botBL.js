@@ -1,4 +1,3 @@
-import encoding from 'encoding';
 import axios from 'axios';
 import PigService from './pigBL';
 import UserDao from '../dataAccess/UserDao';
@@ -32,14 +31,14 @@ export default class BotService {
     if (postback.payload === 'LANGUAGE_LIST') {
       return this.pigService.getLanguagesList(true)
         .then((languageList) => {
-          const [list, chuckSize] = [languageList.rows, 10];
+          const [list, chuckSize] = [languageList.rows, 3];
           const array = new Array(Math.ceil(list.length / chuckSize)).fill().map(() => list.splice(0, chuckSize));
           return array.map(languages => ({
             attachment: {
               type: 'template',
               payload: {
                 template_type: 'button',
-                text: 'Select language',
+                text: '​',
                 buttons: languages.map(language => ({
                   type: 'postback',
                   title: language.name,
@@ -49,34 +48,41 @@ export default class BotService {
             },
           }));
         })
-        .then(responses => Promise.all(responses.map(response => this.sendResponseToFb(user.facebookId, response))))
+        .then(responses => Promise.all([responses, this.sendResponseToFb(user.facebookId, { text: 'Select language' })]))
+        .then(([responses]) => Promise.all(responses.map(response => this.sendResponseToFb(user.facebookId, response))))
         .catch(error => logger.info(error));
     }
 
     if (postback.payload.includes(prefixToLanguagePayload)) {
       const languageId = postback.payload.replace(prefixToLanguagePayload, '');
       return this.pigService.getVoicesList(languageId)
-        .then(voices => ({
-          attachment: {
-            type: 'template',
-            payload: {
-              template_type: 'button',
-              text: 'Select language',
-              buttons: voices.rows.map(voice => ({
-                type: 'postback',
-                title: voice.name,
-                payload: `${prefixToVoiceChangePayload}${voice.languageCode}`,
-              })),
+        .then((voiceList) => {
+          const [list, chuckSize] = [voiceList.rows, 3];
+          const array = new Array(Math.ceil(list.length / chuckSize)).fill().map(() => list.splice(0, chuckSize));
+          return array.map(voices => ({
+            attachment: {
+              type: 'template',
+              payload: {
+                template_type: 'button',
+                text: '​',
+                buttons: voices.map(voice => ({
+                  type: 'postback',
+                  title: voice.name,
+                  payload: `${prefixToVoiceChangePayload}${voice.id}`,
+                })),
+              },
             },
-          },
-        }))
-        .then(response => this.sendResponseToFb(user.facebookId, response));
+          }));
+        })
+        .then(responses => Promise.all([responses, this.sendResponseToFb(user.facebookId, { text: 'Select voice' })]))
+        .then(([responses]) => Promise.all(responses.map(response => this.sendResponseToFb(user.facebookId, response))))
+        .catch(error => logger.info(error));
     }
 
     if (postback.payload.includes(prefixToVoiceChangePayload)) {
       const voiceId = postback.payload.replace(prefixToVoiceChangePayload, '');
       return this.userDao.updateUserVoiceId(user.id, voiceId)
-        .then(() => this.sendResponseToFb(user.id, { text: 'Voice changed' }));
+        .then(() => this.sendResponseToFb(user.facebookId, { text: 'Voice changed' }));
     }
 
     if (postback.payload === 'CURRENT_VOICE') {
@@ -90,7 +96,6 @@ export default class BotService {
       recipient: { id: userFacebookId },
       message: response,
     })
-      .then(res => logger.info(res))
       .catch(error => logger.info(error));
   }
 
