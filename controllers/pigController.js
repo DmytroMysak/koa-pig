@@ -11,7 +11,7 @@ router.post('/say', (req, res, next) => {
   const { text, voiceId } = req.body;
   return ChatDataModel.build({ text, voiceId, userId: req.user.id })
     .validate()
-    .then(chatData => pigBL.pigSpeak(chatData))
+    .then(chatData => pigBL.pigSpeak(chatData.get()))
     .then(() => res.status(204).send())
     .catch(error => next(error));
 });

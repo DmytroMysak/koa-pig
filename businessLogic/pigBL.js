@@ -24,21 +24,21 @@ export default class PigService {
   pigSpeak(chatData) {
     const params = {
       OutputFormat: 'mp3',
-      Text: chatData.get('text'),
-      VoiceId: chatData.get('voiceId'),
+      Text: chatData.text,
+      VoiceId: chatData.voiceId,
     };
     const pathToFile = path.normalize(
       `${__dirname}/../../${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`,
     );
 
-    return this.audioDataDao.getAudioDataByText({ text: chatData.get('text') })
+    return this.audioDataDao.getAudioDataByText({ text: chatData.text, voiceId: chatData.voiceId })
       .then((audioData) => {
         if (!_.isEmpty(audioData)) {
           return [audioData];
         }
 
         return Promise.all([
-          AudioDataModel.build({ voiceId: chatData.get('voiceId'), pathToFile }).validate(),
+          AudioDataModel.build({ voiceId: chatData.voiceId, pathToFile }).validate(),
           Polly.synthesizeSpeech(params).promise(),
         ]);
       })
@@ -54,7 +54,7 @@ export default class PigService {
       })
       .then(([audioData]) => Promise.all([
         this.queue.addToQueue(audioData),
-        this.chatDataDao.saveChatData({ ...chatData.get(), audioId: audioData.get('id') }),
+        this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
       ]));
   }
 

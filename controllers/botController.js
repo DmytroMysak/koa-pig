@@ -7,7 +7,7 @@ const router = express.Router(); // eslint-disable-line new-cap
 const botService = new BotService();
 
 router.get('/webhook', (req, res) => {
-  const { mode, challenge, verify_token: token } = req.query.hub;
+  const { 'hub.mode': mode, 'hub.challenge': challenge, 'hub.verify_token': token } = req.query;
 
   if (mode && token && mode === 'subscribe' && token === config.verifyToken) {
     return res.status(200).send(challenge);
