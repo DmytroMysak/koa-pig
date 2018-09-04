@@ -15,6 +15,13 @@ export default class UserDao {
     });
   }
 
+  getUserByTelegramId(telegramId) {
+    return this.users.findOne({
+      where: { telegramId },
+      include: [{ model: this.voices, required: false }],
+    });
+  }
+
   updateUserVoiceId(userId, voiceId) {
     return this.users.update(
       { selectedVoiceId: voiceId },

@@ -1,5 +1,6 @@
 import Player from 'play-sound';
 import fs from 'fs';
+import path from 'path';
 import config from '../config/env';
 
 export default class Audio {
@@ -22,7 +23,8 @@ export default class Audio {
   }
 
   playSong(audioData) {
-    return new Promise((resolve, reject) => this.player.play(audioData.pathToFile, (err) => {
+    const pathToFile = path.normalize(`${__dirname}/../..${audioData.pathToFile}`);
+    return new Promise((resolve, reject) => this.player.play(pathToFile, (err) => {
       if (err) {
         reject(err);
       }

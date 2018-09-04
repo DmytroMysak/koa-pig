@@ -11,7 +11,11 @@ export default (sequelize, DataTypes) => {
       },
       facebookId: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true,
+      },
+      telegramId: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
       },
       selectedVoiceId: {
         type: DataTypes.STRING(100),

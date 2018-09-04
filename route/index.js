@@ -1,10 +1,10 @@
 import express from 'express';
 import pigRoute from '../controllers/pigController';
-import botRoute from '../controllers/botController';
+import messengerRoute from '../controllers/messengerServiceController';
 
 const router = express.Router();
 
 router.use('/pig', pigRoute);
-router.use('/bot', botRoute);
+router.use('/bot/messenger', messengerRoute);
 
 export default router;

@@ -28,7 +28,7 @@ gulp.task('babel', () =>
   gulp.src(paths.js, { base: '.' })
     .pipe(sourcemaps.init())
     .pipe(babel({ presets: ['env', 'stage-3'] }))
-    .pipe(sourcemaps.write('.'))
+    .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../' }))
     .pipe(gulp.dest('dist')));
 
 gulp.task('run', () => {

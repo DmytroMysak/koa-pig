@@ -19,8 +19,11 @@ const defaults = {
   folderToSaveSongs: 'songs',
   folderToSaveLogs: 'logs',
   songFormat: 'mp3',
-  verifyToken: process.env.FB_VERITY_TOKEN,
-  accessToken: process.env.FB_ACCESS_TOKEN,
+  fbVerifyToken: process.env.FB_VERITY_TOKEN,
+  fbAccessToken: process.env.FB_ACCESS_TOKEN,
+  telegramVerifyToken: process.env.TELEGRAM_VERITY_TOKEN,
+  appUrl: 'https://lectus.serveo.net',
+  telegramPath: '/bot/telegram/webhook',
   defaultVoiceId: 'Maxim',
 };
 

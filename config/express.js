@@ -8,6 +8,7 @@ import expressWinston from 'express-winston';
 import routes from '../route';
 import logger, { options } from '../helper/logger';
 import userMiddleware from './middleware/userMiddleware';
+import telegramBot from '../businessLogic/telegramBL';
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(expressWinston.logger({
 }));
 
 app.use(userMiddleware);
+app.use(telegramBot.webhookCallback('/bot/telegram/webhook'));
 app.use('/', routes);
 app.use((req, res) => res.status(404).send('404 page'));
 

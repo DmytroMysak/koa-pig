@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import Polly from './awsBL';
 import Audio from './audioBL';
@@ -27,9 +28,7 @@ export default class PigService {
       Text: chatData.text,
       VoiceId: chatData.voiceId,
     };
-    const pathToFile = path.normalize(
-      `${__dirname}/../../${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`,
-    );
+    const pathToFile = `/${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
 
     return this.audioDataDao.getAudioDataByText({ text: chatData.text, voiceId: chatData.voiceId })
       .then((audioData) => {
@@ -37,8 +36,9 @@ export default class PigService {
           return [audioData];
         }
 
+        // get audio stream from aws
         return Promise.all([
-          AudioDataModel.build({ voiceId: chatData.voiceId, pathToFile }).validate(),
+          AudioDataModel.build({ id: uuidv4(), voiceId: chatData.voiceId, pathToFile }).validate(),
           Polly.synthesizeSpeech(params).promise(),
         ]);
       })
@@ -47,15 +47,15 @@ export default class PigService {
           return [audioData];
         }
 
+        // save audioStream to file && save text + audio_id to db
         return Promise.all([
           this.audioDataDao.saveAudioData(audioData.get()),
+          this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
           this.audio.saveStreamToFile(audioData.get(), audioStream),
         ]);
       })
-      .then(([audioData]) => Promise.all([
-        this.queue.addToQueue(audioData),
-        this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
-      ]));
+      .then(([audioData]) => Promise.all([audioData, this.queue.addToQueue(audioData)]))
+      .then(([audioData]) => audioData);
   }
 
   getLanguagesList(unique) {

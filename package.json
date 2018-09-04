@@ -13,13 +13,13 @@
   },
   "betterScripts": {
     "start-prod": {
-      "command": "pm2 start dist/index.js --name server-prod",
+      "command": "pm2 start dist/index.js --name bot-prod",
       "env": {
         "NODE_ENV": "production"
       }
     },
     "start-dev": {
-      "command": "pm2 start dist/index.js --name server-dev",
+      "command": "pm2 start dist/index.js --name bot-dev",
       "env": {
         "NODE_ENV": "development"
       }
@@ -48,6 +48,8 @@
     "play-sound": "^1.1.2",
     "pm2": "^2.10.4",
     "sequelize": "^4.38.0",
+    "telegraf": "^3.21.2",
+    "uuid": "^3.3.2",
     "winston": "^2.4.2"
   },
   "devDependencies": {
