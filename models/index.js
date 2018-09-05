@@ -75,7 +75,7 @@ Object.keys(models).forEach((modelName) => {
 });
 
 if (config.env !== 'test') {
-  sequelize.sync().then(() => logger.log('synced'));
+  sequelize.sync().then(() => logger.info('synced'));
 }
 
 export default sequelize;

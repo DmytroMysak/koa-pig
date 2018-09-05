@@ -1,6 +1,5 @@
 import winston from 'winston';
 import fs from 'fs';
-import moment from 'moment';
 import config from '../config/env';
 
 // Create the log directory if it does not exist
@@ -8,26 +7,27 @@ if (!fs.existsSync(config.folderToSaveLogs)) {
   fs.mkdirSync(config.folderToSaveLogs);
 }
 
-const tsFormat = () => moment().format('DD/MM/YYYY HH:mm:ss');
-
 export const options = {
   file: {
     level: config.env === 'development' ? 'debug' : 'info',
     filename: `${config.folderToSaveLogs}/results.log`,
-    handleExceptions: true,
-    json: true,
-    timestamp: tsFormat,
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json(),
+    ),
   },
   console: {
     level: 'debug',
-    timestamp: tsFormat,
-    handleExceptions: true,
-    json: true,
-    colorize: true,
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.printf(function(info) {
+        return `${new Date().toISOString()}-${info.level}: \n${typeof info.message === 'object' ? JSON.stringify(info.message, null, 4) : info.message}\n`;
+      }),
+    ),
   },
 };
 
-const logger = new (winston.Logger)({
+const logger = winston.createLogger({
   transports: [
     new (winston.transports.Console)(options.console),
     new (winston.transports.File)(options.file),
