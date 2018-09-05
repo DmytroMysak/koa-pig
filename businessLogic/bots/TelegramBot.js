@@ -1,12 +1,12 @@
 import Telegraf from 'telegraf';
 import _ from 'lodash';
+import path from 'path';
 import Bot from './Bot';
 import logger from '../../helper/logger';
 import PigService from './../pigBL';
 import config from '../../config/env/index';
 import UserDao from '../../dataAccess/UserDao';
 import { models } from '../../models';
-import path from "path";
 
 const { chatData: ChatDataModel } = models;
 
@@ -45,6 +45,10 @@ export default class TelegramBot extends Bot {
         .validate()
         .then(chatData => this.pigService.pigSpeak(chatData.get()))
         .then(audioData => ctx.replyWithAudio({ source: path.normalize(`${__dirname}/../../..${audioData.pathToFile}`) }));
+    });
+
+    this.bot.catch((err) => {
+      logger.error(err);
     });
   }
 
