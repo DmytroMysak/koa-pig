@@ -27,13 +27,7 @@ export default class TelegramBot extends Bot {
 
     this.bot.start(ctx => ctx.reply('Welcome! Write me some text. For more info use /help'));
 
-    this.bot.help(ctx => ctx.reply(`
-    /menu or /m -> menu \n
-    /selected or /s -> current voice \n
-    /change or /c -> change voice \n
-    /language or /l -> language list \n
-    /voice or /v -> voice list \n
-    `));
+    this.bot.help(ctx => ctx.reply(`/menu or /m -> menu \n/selected or /s -> current voice \n/change or /c -> change voice \n/language or /l -> language list \n/voice or /v -> voice list`));
 
     this.bot.command('menu', ctx => this.menu(ctx));
     this.bot.command('m', ctx => this.menu(ctx));
