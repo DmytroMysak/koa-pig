@@ -1,4 +1,6 @@
 import Telegraf from 'telegraf';
+import Markup from 'telegraf/markup';
+import Extra from 'telegraf/extra';
 import _ from 'lodash';
 import path from 'path';
 import Bot from './Bot';
@@ -16,12 +18,34 @@ export default class TelegramBot extends Bot {
     super();
     this.pigService = new PigService();
     this.audio = new Audio();
-    this.bot = new Telegraf(config.telegramVerifyToken);
+    this.bot = new Telegraf(config.telegramVerifyToken, {username: 'LittlePigBot'});
     this.bot.telegram.setWebhook(`${config.appUrl}${config.telegramPath}`);
   }
 
   init() {
     this.bot.use((ctx, next) => this.userMiddleware(ctx, next));
+
+    this.bot.start(ctx => ctx.reply('Welcome! Write me some text. For more info use /help'));
+
+    this.bot.help(ctx => ctx.reply(`
+    /menu or /m -> menu \n
+    /selected or /s -> current voice \n
+    /change or /c -> change voice \n
+    /language or /l -> language list \n
+    /voice or /v -> voice list \n
+    `));
+
+    this.bot.command('menu', ctx => this.menu(ctx));
+    this.bot.command('m', ctx => this.menu(ctx));
+    // TODO
+    this.bot.command('selected', ctx => ctx.reply('not implemented yet'));
+    this.bot.command('s', ctx => ctx.reply('not implemented yet'));
+    this.bot.command('change', ctx => ctx.reply('not implemented yet'));
+    this.bot.command('c', ctx => ctx.reply('not implemented yet'));
+    this.bot.command('language', ctx => ctx.reply('not implemented yet'));
+    this.bot.command('l', ctx => ctx.reply('not implemented yet'));
+    this.bot.command('voice', ctx => ctx.reply('not implemented yet'));
+    this.bot.command('v', ctx => ctx.reply('not implemented yet'));
 
     this.bot.on('text', (ctx) => {
       const { message: { text } } = ctx;
@@ -42,11 +66,11 @@ export default class TelegramBot extends Bot {
 
     this.bot.on('audio', ctx => this.workWithAudio(ctx));
 
-    this.bot.command('start', ctx => ctx.reply('write text to see result)'));
-
     this.bot.catch((err) => {
       if (err) {
         logger.error(err);
+        // тому що вінстон 3.0 гамно їбане блять
+        console.log(err); // eslint-disable-line no-console
       }
     });
   }
@@ -60,6 +84,9 @@ export default class TelegramBot extends Bot {
   }
 
   userMiddleware(ctx, next) {
+    if (!ctx.message) {
+      return next();
+    }
     logger.info(ctx.message);
     const userDao = new UserDao(models);
     const telegramId = ctx.message.from.id.toString();
@@ -79,6 +106,23 @@ export default class TelegramBot extends Bot {
         return next();
       })
       .catch(err => logger.error(err));
+  }
+
+  // TODO
+  menu({ reply }) {
+    // return reply('MENU', Markup
+    //   .inlineKeyboard([
+    //     Markup.callbackButton('Selected voice', '/s'),
+    //     Markup.callbackButton('Language list', '/l'),
+    //     Markup.callbackButton('Voice list', '/v'),
+    //   ])
+    // );
+    return reply('MENU', Extra.HTML().markup(m => m.inlineKeyboard([
+      Markup.callbackButton('Selected voice', '/s'),
+      Markup.callbackButton('Language list', '/l'),
+      Markup.callbackButton('Voice list', '/v'),
+      ]))
+    );
   }
 
   start() {

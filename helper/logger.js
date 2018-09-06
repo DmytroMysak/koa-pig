@@ -20,8 +20,9 @@ export const options = {
     level: 'debug',
     format: winston.format.combine(
       winston.format.colorize(),
-      winston.format.timestamp(),
-      winston.format.prettyPrint(),
+      winston.format.printf(function(info) {
+        return `${new Date().toISOString()}-${info.level}: \n${typeof info.message === 'object' ? JSON.stringify(info.message, null, 4) : info.message}\n`;
+      }),
     ),
   },
 };
