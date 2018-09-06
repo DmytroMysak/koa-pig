@@ -42,6 +42,8 @@ export default class TelegramBot extends Bot {
 
     this.bot.on('audio', ctx => this.workWithAudio(ctx));
 
+    this.bot.command('start', ctx => ctx.reply('write text to see result)'));
+
     this.bot.catch((err) => {
       if (err) {
         logger.error(err);

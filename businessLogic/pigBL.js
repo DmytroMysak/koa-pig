@@ -46,14 +46,17 @@ export default class PigService {
           return [audioData];
         }
 
-        // save audioStream to file && save text + audio_id to db
+        // save audioStream to file + audio_id to db
         return Promise.all([
           this.audioDataDao.saveAudioData(audioData.get()),
-          this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
           this.audio.saveStreamToFile(audioData.get(), audioStream.AudioStream),
         ]);
       })
-      .then(([audioData]) => Promise.all([audioData.get(), this.queue.addToQueue(audioData.get())]))
+      .then(([audioData]) => Promise.all([
+        audioData.get(),
+        this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
+        this.queue.addToQueue(audioData.get()),
+      ]))
       .then(([audioData]) => audioData);
   }
 
