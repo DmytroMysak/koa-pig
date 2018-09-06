@@ -14,7 +14,8 @@ export default class Audio {
 
   saveStreamToFile(audioData, stream) {
     return new Promise((resolve, reject) => {
-      const writeStream = fs.createWriteStream(audioData.pathToFile);
+      const fullPath = path.normalize(`${__dirname}/../..${audioData.pathToFile}`);
+      const writeStream = fs.createWriteStream(fullPath);
       writeStream.end(stream.AudioStream);
       writeStream
         .on('finish', () => resolve())

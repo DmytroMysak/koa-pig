@@ -54,7 +54,7 @@ export default class PigService {
           this.audio.saveStreamToFile(audioData.get(), audioStream),
         ]);
       })
-      .then(([audioData]) => Promise.all([audioData, this.queue.addToQueue(audioData)]))
+      .then(([audioData]) => Promise.all([audioData.get(), this.queue.addToQueue(audioData.get())]))
       .then(([audioData]) => audioData);
   }
 

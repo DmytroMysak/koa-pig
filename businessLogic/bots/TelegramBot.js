@@ -48,7 +48,9 @@ export default class TelegramBot extends Bot {
     });
 
     this.bot.catch((err) => {
-      logger.error(err);
+      if (err) {
+        logger.error(err);
+      }
     });
   }
 
