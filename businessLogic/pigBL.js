@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
 import Polly from './awsBL';
 import Audio from './audioBL';
 import { models } from '../models/index';
@@ -22,7 +21,7 @@ export default class PigService {
     this.audio = new Audio();
   }
 
-  pigSpeak(chatData) {
+  pigSpeakText(chatData) {
     const params = {
       OutputFormat: 'mp3',
       Text: chatData.text,
@@ -51,7 +50,35 @@ export default class PigService {
         return Promise.all([
           this.audioDataDao.saveAudioData(audioData.get()),
           this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
-          this.audio.saveStreamToFile(audioData.get(), audioStream),
+          this.audio.saveStreamToFile(audioData.get(), audioStream.AudioStream),
+        ]);
+      })
+      .then(([audioData]) => Promise.all([audioData.get(), this.queue.addToQueue(audioData.get())]))
+      .then(([audioData]) => audioData);
+  }
+
+  pigSpeakAudio(fileId, getFileUrl) {
+    const pathToFile = `/${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
+
+    return this.audioDataDao.getAudioDataByFileId(fileId)
+      .then((audioData) => {
+        if (!_.isEmpty(audioData)) {
+          return [audioData];
+        }
+
+        return Promise.all([
+          AudioDataModel.build({ type: 'AUDIO_FILE_FROM_TELEGRAM', fileId, pathToFile }).validate(),
+          getFileUrl(),
+        ]);
+      })
+      .then(([audioData, fileUrl]) => {
+        if (_.isEmpty(fileUrl)) {
+          return [audioData];
+        }
+
+        return Promise.all([
+          this.audioDataDao.saveAudioData(audioData.get()),
+          this.audio.saveAudioToFileFromUrl(audioData, fileUrl),
         ]);
       })
       .then(([audioData]) => Promise.all([audioData.get(), this.queue.addToQueue(audioData.get())]))

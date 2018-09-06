@@ -21,7 +21,7 @@ export default class MessengerService {
     const { text } = message;
     return ChatDataModel.build({ text, voiceId: user.selectedVoiceId || config.defaultVoiceId, userId: user.id })
       .validate()
-      .then(chatData => this.pigService.pigSpeak(chatData.get()));
+      .then(chatData => this.pigService.pigSpeakText(chatData.get()));
   }
 
   handlePostBack(postback, user) {

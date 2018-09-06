@@ -15,8 +15,16 @@ export default (sequelize, DataTypes) => {
       },
       voiceId: {
         type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      type: {
+        type: DataTypes.ENUM('AWS', 'TELEGRAM'),
         allowNull: false,
-        defaultValue: sequelize.literal('now()'),
+        defaultValue: 'AWS',
+      },
+      fileId: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
       },
     },
     {

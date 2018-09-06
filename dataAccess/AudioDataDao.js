@@ -20,4 +20,8 @@ export default class AudioDataDao {
     })
       .then(chatData => (_.isEmpty(chatData) && {}) || chatData.audio);
   }
+
+  getAudioDataByFileId(fileId) {
+    return this.audioData.findOne({ where: { fileId } })
+  }
 }

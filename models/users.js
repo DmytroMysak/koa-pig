@@ -21,9 +21,17 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
-      name: {
+      firstName: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
+      },
+      lastName: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      userName: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
       },
     },
     {
