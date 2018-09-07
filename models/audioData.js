@@ -18,7 +18,7 @@ export default (sequelize, DataTypes) => {
         allowNull: true,
       },
       type: {
-        type: DataTypes.ENUM('AWS', 'TELEGRAM'),
+        type: DataTypes.ENUM('AWS', 'TELEGRAM', 'YOUTUBE'),
         allowNull: false,
         defaultValue: 'AWS',
       },

@@ -46,10 +46,20 @@ const isValidJson = (json) => {
   }
 };
 
+/**
+ * isUrl
+ *      Validate if input string is valid stringify json
+ *
+ * @return  {boolean} isJson
+ * @param  {string} text
+ */
+const isUrl = text => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi.test(text.toString());
+
 
 export default {
   isUUID,
   isBooleanString,
   isValidDate,
   isValidJson,
+  isUrl,
 };

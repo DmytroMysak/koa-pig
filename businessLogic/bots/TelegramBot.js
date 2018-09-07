@@ -5,6 +5,7 @@ import _ from 'lodash';
 import path from 'path';
 import Bot from './Bot';
 import logger from '../../helper/logger';
+import validator from '../../helper/validator';
 import PigService from '../pigBL';
 import Audio from '../audioBL';
 import config from '../../config/env/index';
@@ -18,16 +19,15 @@ export default class TelegramBot extends Bot {
     super();
     this.pigService = new PigService();
     this.audio = new Audio();
-    this.bot = new Telegraf(config.telegramVerifyToken, {username: 'LittlePigBot'});
+    this.bot = new Telegraf(config.telegramVerifyToken, { username: 'LittlePigBot' });
     this.bot.telegram.setWebhook(`${config.appUrl}${config.telegramPath}`);
   }
 
   init() {
+    this.bot.use((ctx, next) => this.initMiddleware(ctx, next));
     this.bot.use((ctx, next) => this.userMiddleware(ctx, next));
-
     this.bot.start(ctx => ctx.reply('Welcome! Write me some text. For more info use /help'));
-
-    this.bot.help(ctx => ctx.reply(`/menu or /m -> menu \n/selected or /s -> current voice \n/change or /c -> change voice \n/language or /l -> language list \n/voice or /v -> voice list`));
+    this.bot.help(ctx => ctx.reply('/menu or /m -> menu \n/selected or /s -> current voice \n/change or /c -> change voice \n/language or /l -> language list \n/voice or /v -> voice list'));
 
     this.bot.command('menu', ctx => this.menu(ctx));
     this.bot.command('m', ctx => this.menu(ctx));
@@ -41,24 +41,14 @@ export default class TelegramBot extends Bot {
     this.bot.command('voice', ctx => ctx.reply('not implemented yet'));
     this.bot.command('v', ctx => ctx.reply('not implemented yet'));
 
-    this.bot.on('text', (ctx) => {
-      const { message: { text } } = ctx;
-      ctx.reply('Processing...');
-
-      return ChatDataModel.build({ text, voiceId: ctx.user.selectedVoiceId || config.defaultVoiceId, userId: ctx.user.id })
-        .validate()
-        .then(chatData => this.pigService.pigSpeakText(chatData.get()))
-        .then(audioData => ctx.replyWithAudio({ source: path.normalize(`${__dirname}/../../..${audioData.pathToFile}`) }));
-    });
-
+    this.bot.on('text', ctx => this.workWithText(ctx));
+    this.bot.on('audio', ctx => this.workWithAudio(ctx));
     this.bot.on('document', (ctx) => {
       if (ctx.message.document.mime_type !== 'audio/mp3') {
-        return ctx.reply('Що мені блять з цим робити?');
+        return ctx.reply('І що мені блять з цим робити?');
       }
       return this.workWithAudio(ctx);
     });
-
-    this.bot.on('audio', ctx => this.workWithAudio(ctx));
 
     this.bot.catch((err) => {
       if (err) {
@@ -71,10 +61,23 @@ export default class TelegramBot extends Bot {
 
   workWithAudio(ctx) {
     const fileId = ctx.message.audio.file_id;
-    ctx.reply('Processing...');
-
     return this.pigService.pigSpeakAudio(fileId, () => ctx.telegram.getFileLink(ctx.message.audio))
       .then(() => ctx.reply('Done'));
+  }
+
+  workWithText(ctx) {
+    const { message: { text } } = ctx;
+    if (validator.isUrl(text) && !text.includes('youtube')) {
+      return ctx.reply('І що мені блять з цим робити?');
+    }
+    if (validator.isUrl(text)) {
+      return this.pigService.pigSpeakFromUrl(text);
+    }
+
+    return ChatDataModel.build({ text, voiceId: ctx.user.selectedVoiceId || config.defaultVoiceId, userId: ctx.user.id })
+      .validate()
+      .then(chatData => this.pigService.pigSpeakText(chatData.get()))
+      .then(audioData => ctx.replyWithAudio({ source: path.normalize(`${__dirname}/../../..${audioData.pathToFile}`) }));
   }
 
   userMiddleware(ctx, next) {
@@ -102,6 +105,15 @@ export default class TelegramBot extends Bot {
       .catch(err => logger.error(err));
   }
 
+  initMiddleware(ctx, next) {
+    ctx.reply('Processing...');
+    if (!ctx.message) {
+      return next();
+    }
+    logger.info(ctx.message);
+    return next();
+  }
+
   // TODO
   menu({ reply }) {
     // return reply('MENU', Markup
@@ -115,7 +127,7 @@ export default class TelegramBot extends Bot {
       Markup.callbackButton('Selected voice', '/s'),
       Markup.callbackButton('Language list', '/l'),
       Markup.callbackButton('Voice list', '/v'),
-      ]))
+    ])),
     );
   }
 
