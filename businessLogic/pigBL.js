@@ -57,7 +57,8 @@ export default class PigService {
         this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
         this.queue.addToQueue(audioData.get()),
       ]))
-      .then(([audioData]) => audioData);
+      .then(([audioData]) => audioData)
+      .catch(err => console.error(err));
   }
 
   pigSpeakAudio(fileId, getFileUrl) {
@@ -70,7 +71,7 @@ export default class PigService {
         }
 
         return Promise.all([
-          AudioDataModel.build({ type: 'AUDIO_FILE_FROM_TELEGRAM', fileId, pathToFile }).validate(),
+          AudioDataModel.build({ type: 'TELEGRAM', fileId, pathToFile }).validate(),
           getFileUrl(),
         ]);
       })
@@ -85,7 +86,8 @@ export default class PigService {
         ]);
       })
       .then(([audioData]) => Promise.all([audioData.get(), this.queue.addToQueue(audioData.get())]))
-      .then(([audioData]) => audioData);
+      .then(([audioData]) => audioData)
+      .catch(err => console.error(err));
   }
 
   getLanguagesList(unique) {
@@ -93,7 +95,8 @@ export default class PigService {
       .then(data => ({
         rows: data.rows.map(voice => ({ name: voice.languageName, code: voice.languageCode })),
         count: data.count,
-      }));
+      }))
+      .catch(err => console.error(err));
   }
 
   getVoicesList(languageCode = null) {
@@ -108,6 +111,7 @@ export default class PigService {
       .then(data => ({
         rows: data.rows.map(voice => ({ name: voice.name, id: voice.id, gender: voice.gender })),
         count: data.count,
-      }));
+      }))
+      .catch(err => console.error(err));
   }
 }
