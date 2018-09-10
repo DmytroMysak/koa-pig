@@ -15,12 +15,12 @@ import { models } from '../../models';
 const { chatData: ChatDataModel } = models;
 
 export default class TelegramBot extends Bot {
-  constructor() {
+  constructor(appUrl) {
     super();
     this.pigService = new PigService();
     this.audio = new Audio();
     this.bot = new Telegraf(config.telegramVerifyToken, { username: 'LittlePigBot' });
-    this.bot.telegram.setWebhook(`${config.appUrl}${config.telegramPath}`);
+    this.bot.telegram.setWebhook(`${appUrl}${config.telegramPath}`);
   }
 
   init() {

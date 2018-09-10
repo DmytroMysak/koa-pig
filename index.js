@@ -1,42 +1,28 @@
+import localTunnelPromise from './localTunnelPromise';
 import logger from './helper/logger';
-import { models } from './models';
-import Polly from './businessLogic/awsBL';
-import VoicesDao from './dataAccess/VoicesDao';
+import config from './config/env';
+import PigService from './businessLogic/pigBL';
 import TelegramBot from './businessLogic/bots/TelegramBot';
 
-const { voices: VoicesModel } = models;
+const pigService = new PigService();
 
-const updateVoice = () => {
-  const voicesDao = new VoicesDao(models);
-
-  return Polly.describeVoices()
-    .promise()
-    .then((data) => {
-      logger.info('voices initialized');
-      logger.info(data);
-
-      return Promise.all(data.Voices
-        .map(voice => VoicesModel.build({
-          id: voice.Id,
-          gender: voice.Gender,
-          languageCode: voice.LanguageCode,
-          languageName: voice.LanguageName,
-          name: voice.Name,
-        }))
-        .map(voice => voice.validate()),
-      )
-        .then(voices => Promise.all(voices.map(voice => voicesDao.upsertVoice(voice.get()))));
-    });
-};
-
-const startBots = () => {
-  const telegramBot = new TelegramBot();
+// function to go over all bots and start them
+const startBots = (appUrl) => {
+  const telegramBot = new TelegramBot(appUrl);
 
   return Promise.all([
-    telegramBot.start(),
+    telegramBot.start(appUrl),
   ]);
 };
 
-updateVoice()
-  .then(() => startBots())
-  .catch(logger.error);
+localTunnelPromise(config.port)
+  .then((result) => {
+    pigService.updateVoice()
+      .then(() => startBots(result.url))
+      .catch(logger.error);
+  })
+  .catch((err) => {
+    logger.error(err);
+    // тому що вінстон 3.0 гамно їбане блять
+    console.log(err); // eslint-disable-line no-console
+  });

@@ -12,8 +12,9 @@ import ChatDataDao from '../dataAccess/ChatDataDao';
 import AudioDataDao from '../dataAccess/AudioDataDao';
 import Queue from './queueBL';
 import config from '../config/env';
+import logger from '../helper/logger';
 
-const { audioData: AudioDataModel } = models;
+const { audioData: AudioDataModel, voices: VoicesModel } = models;
 
 export default class PigService {
   constructor() {
@@ -62,6 +63,29 @@ export default class PigService {
       ]))
       .then(([audioData]) => audioData)
       .catch(err => console.error(err));
+  }
+
+  updateVoice() {
+    const voicesDao = new VoicesDao(models);
+
+    return Polly.describeVoices()
+      .promise()
+      .then((data) => {
+        logger.info('voices initialized');
+        logger.info(data);
+
+        return Promise.all(data.Voices
+          .map(voice => VoicesModel.build({
+            id: voice.Id,
+            gender: voice.Gender,
+            languageCode: voice.LanguageCode,
+            languageName: voice.LanguageName,
+            name: voice.Name,
+          }))
+          .map(voice => voice.validate()),
+        )
+          .then(voices => Promise.all(voices.map(voice => voicesDao.upsertVoice(voice.get()))));
+      });
   }
 
   pigSpeakAudio(fileId, getFileUrl) {
