@@ -8,7 +8,7 @@ ExecStart=autossh -M 0 -R 80:localhost:8080 serveo.net &; ./start-prod.sh
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=pig-unicorn-bot
+SyslogIdentifier=pig
 User=pi
 Group=pi
 
