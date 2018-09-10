@@ -4,7 +4,7 @@ After=network-online.target
 
 [Service]
 WorkingDirectory=/home/pi/koa-pig
-ExecStart=autossh -M 0 -R 80:localhost:8080 serveo.net &; ./start-prod.sh
+ExecStart=./start-prod.sh && autossh -M 0 -R 80:localhost:8080 serveo.net &
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
