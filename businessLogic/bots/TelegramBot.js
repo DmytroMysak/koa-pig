@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import Telegraf from 'telegraf';
 import Markup from 'telegraf/markup';
 import Extra from 'telegraf/extra';
@@ -7,7 +8,6 @@ import Bot from './Bot';
 import logger from '../../helper/logger';
 import validator from '../../helper/validator';
 import PigService from '../pigBL';
-import Audio from '../audioBL';
 import config from '../../config/env/index';
 import UserDao from '../../dataAccess/UserDao';
 import { models } from '../../models';
@@ -17,8 +17,10 @@ const { chatData: ChatDataModel } = models;
 export default class TelegramBot extends Bot {
   constructor(appUrl) {
     super();
+    this.languageChangePrefix = 'language_change_';
+    this.voiceChangePrefix = 'voice_change_';
     this.pigService = new PigService();
-    this.audio = new Audio();
+    this.userDao = new UserDao(models);
     this.bot = new Telegraf(config.telegramVerifyToken, { username: 'LittlePigBot' });
     this.bot.telegram.setWebhook(`${appUrl}${config.telegramPath}`);
   }
@@ -28,33 +30,44 @@ export default class TelegramBot extends Bot {
     this.bot.use((ctx, next) => this.userMiddleware(ctx, next));
     this.bot.start(ctx => ctx.reply('Welcome! Write me some text. For more info use /help'));
     this.bot.help(ctx => ctx.reply('/menu or /m -> menu \n/selected or /s -> current voice \n/change or /c -> change voice \n/language or /l -> language list \n/voice or /v -> voice list'));
+    this.bot.command(['menu', 'm'], ctx => this.menu(ctx));
+    this.bot.command(['selected', 's'], ctx => this.sendSelectedVoice(ctx));
+    this.bot.command(['language', 'l'], ctx => this.sendLanguageList(ctx));
+    this.bot.command(['voice', 'v'], ctx => this.sendVoiceList(ctx));
+    this.bot.command(['change', 'c'], ctx => this.sendChangeVoiceInstructions(ctx));
 
-    this.bot.command('menu', ctx => this.menu(ctx));
-    this.bot.command('m', ctx => this.menu(ctx));
-    // TODO
-    this.bot.command('selected', ctx => ctx.reply('not implemented yet'));
-    this.bot.command('s', ctx => ctx.reply('not implemented yet'));
-    this.bot.command('change', ctx => ctx.reply('not implemented yet'));
-    this.bot.command('c', ctx => ctx.reply('not implemented yet'));
-    this.bot.command('language', ctx => ctx.reply('not implemented yet'));
-    this.bot.command('l', ctx => ctx.reply('not implemented yet'));
-    this.bot.command('voice', ctx => ctx.reply('not implemented yet'));
-    this.bot.command('v', ctx => ctx.reply('not implemented yet'));
 
+    this.bot.on('callback_query', (ctx) => {
+      if (ctx.callbackQuery.data === '/s') {
+        return this.sendSelectedVoice(ctx);
+      }
+      if (ctx.callbackQuery.data === '/l') {
+        return this.sendLanguageList(ctx);
+      }
+      if (ctx.callbackQuery.data === '/c') {
+        return this.sendChangeVoiceInstructions(ctx);
+      }
+      if (ctx.callbackQuery.data.startsWith(this.languageChangePrefix)) {
+        const languageId = ctx.callbackQuery.data.replace(this.languageChangePrefix, '');
+        return this.sendVoiceList(ctx, languageId);
+      }
+      if (ctx.callbackQuery.data.startsWith(this.voiceChangePrefix)) {
+        const voiceId = ctx.callbackQuery.data.replace(this.voiceChangePrefix, '');
+        return this.changeUserVoice(ctx, voiceId);
+      }
+      return ctx.reply('І що мені з цим робити?');
+    });
     this.bot.on('text', ctx => this.workWithText(ctx));
     this.bot.on('audio', ctx => this.workWithAudio(ctx));
     this.bot.on('document', (ctx) => {
       if (ctx.message.document.mime_type !== 'audio/mp3') {
-        return ctx.reply('І що мені блять з цим робити?');
+        return ctx.reply('І що мені з цим робити?');
       }
       return this.workWithAudio(ctx);
     });
-
     this.bot.catch((err) => {
       if (err) {
-        logger.error(err);
-        // тому що вінстон 3.0 гамно їбане блять
-        console.log(err); // eslint-disable-line no-console
+        console.error(err);
       }
     });
   }
@@ -68,7 +81,7 @@ export default class TelegramBot extends Bot {
   workWithText(ctx) {
     const { message: { text } } = ctx;
     if (validator.isUrl(text) && !text.includes('youtube')) {
-      return ctx.reply('І що мені блять з цим робити?');
+      return ctx.reply('І що мені з цим робити?');
     }
     if (validator.isUrl(text)) {
       return this.pigService.pigSpeakFromUrl(text);
@@ -81,54 +94,95 @@ export default class TelegramBot extends Bot {
   }
 
   userMiddleware(ctx, next) {
-    if (!ctx.message) {
+    if (!ctx.from) {
       return next();
     }
-    logger.info(ctx.message);
-    const userDao = new UserDao(models);
-    const telegramId = ctx.message.from.id.toString();
-    const { user_name: userName, first_name: firstName, last_name: lastName } = ctx.message.from;
+    const {
+      user_name: userName, first_name: firstName, last_name: lastName, id: telegramId,
+    } = ctx.from;
 
-    return userDao.getUserByTelegramId(telegramId)
+    return this.userDao.getUserByTelegramId(telegramId.toString())
       .then((user) => {
         if (!_.isEmpty(user)) {
           return user;
         }
-        return userDao.addUser({
-          telegramId, userName, firstName, lastName,
+        return this.userDao.addUser({
+          telegramId: telegramId.toString(), userName, firstName, lastName,
         });
       })
       .then((user) => {
         ctx.user = user.get();
         return next();
       })
-      .catch(err => logger.error(err));
+      .catch(err => console.error(err));
   }
 
   initMiddleware(ctx, next) {
-    ctx.reply('Processing...');
-    if (!ctx.message) {
+    if (!ctx.message || ctx.message.text.startsWith('/')) {
       return next();
     }
+    ctx.reply('Processing...');
     logger.info(ctx.message);
     return next();
   }
 
-  // TODO
   menu({ reply }) {
-    // return reply('MENU', Markup
-    //   .inlineKeyboard([
-    //     Markup.callbackButton('Selected voice', '/s'),
-    //     Markup.callbackButton('Language list', '/l'),
-    //     Markup.callbackButton('Voice list', '/v'),
-    //   ])
-    // );
     return reply('MENU', Extra.HTML().markup(m => m.inlineKeyboard([
-      Markup.callbackButton('Selected voice', '/s'),
-      Markup.callbackButton('Language list', '/l'),
-      Markup.callbackButton('Voice list', '/v'),
-    ])),
-    );
+      [Markup.callbackButton('Selected voice', '/s'), Markup.callbackButton('Change voice', '/c')],
+      [Markup.callbackButton('Language list', '/l'), Markup.callbackButton('Voice list', '/v')],
+    ])));
+  }
+
+  sendChangeVoiceInstructions(ctx) {
+    const text = `You have 2 options to change voice:
+    - Press 'Language list' button, select language then select voice.
+    - Press 'Voice list' button and select voice.`;
+    return ctx.reply(text, Extra.HTML().markup(m => m.inlineKeyboard([
+      Markup.callbackButton('Language list', '/l'), Markup.callbackButton('Voice list', '/v'),
+    ])));
+  }
+
+  sendSelectedVoice(ctx) {
+    if (!ctx.user.voice) {
+      return ctx.reply(`${config.defaultVoiceId}(Male, Russian)`);
+    }
+    const voice = ctx.user.voice.get();
+    return ctx.reply(`${voice.name}(${voice.gender}, ${voice.languageName})`);
+  }
+
+  sendLanguageList(ctx) {
+    return this.pigService.getLanguagesList(true)
+      .then((languageList) => {
+        const buttonNameFunction = elem => elem.name;
+        const buttonIdFunction = elem => `${this.languageChangePrefix}${elem.code}`;
+        return this.createInlineKeyboard(languageList.rows, 3, buttonNameFunction, buttonIdFunction);
+      })
+      .then(list => ctx.reply('language list', list))
+      .catch(error => console.error(error));
+  }
+
+  sendVoiceList(ctx, languageId = null) {
+    return this.pigService.getVoicesList(languageId)
+      .then((voiceList) => {
+        const buttonNameFunction = elem => `${elem.name}(${elem.gender}${languageId ? '' : `, ${elem.languageCode}`})`;
+        const buttonIdFunction = elem => `${this.voiceChangePrefix}${elem.id}`;
+        return this.createInlineKeyboard(voiceList.rows, languageId ? 3 : 2, buttonNameFunction, buttonIdFunction);
+      })
+      .then(list => ctx.reply('voice list', list))
+      .catch(error => console.error(error));
+  }
+
+  createInlineKeyboard(list, chuckSize, buttonNameFunction, buttonIdFunction) {
+    const chuckedArray = new Array(Math.ceil(list.length / chuckSize)).fill().map(() => list.splice(0, chuckSize));
+    return Extra.HTML().markup(m => m.inlineKeyboard(
+      chuckedArray.map(array => array.map(elem => Markup.callbackButton(buttonNameFunction(elem), buttonIdFunction(elem)))),
+    ));
+  }
+
+  changeUserVoice(ctx, voiceId) {
+    return this.userDao.updateUserVoiceId(ctx.user.id, voiceId)
+      .then(() => ctx.reply('Voice changed'))
+      .catch(error => console.error(error));
   }
 
   start() {

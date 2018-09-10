@@ -150,7 +150,7 @@ export default class PigService {
     return this.voicesDao.getVoices(unique)
       .then(data => ({
         rows: data.rows.map(voice => ({ name: voice.languageName, code: voice.languageCode })),
-        count: data.count,
+        count: data.count.length,
       }))
       .catch(err => console.error(err));
   }

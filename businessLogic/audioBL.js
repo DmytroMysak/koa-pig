@@ -35,7 +35,7 @@ export default class Audio {
         writeStream.on('error', () => reject(new Error('Error writing to file!')));
         writeStream.on('finish', () => writeStream.close(resolve));
       });
-    }).catch(err => logger.error(err));
+    }).catch(err => console.error(err));
   }
 
   playSong(audioData) {
