@@ -3,6 +3,7 @@ import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import ytdl from 'ytdl-core';
 import ffmpeg from 'fluent-ffmpeg';
+import path from 'path';
 import Polly from './awsBL';
 import Audio from './audioBL';
 import { models } from '../models/index';
@@ -11,7 +12,6 @@ import ChatDataDao from '../dataAccess/ChatDataDao';
 import AudioDataDao from '../dataAccess/AudioDataDao';
 import Queue from './queueBL';
 import config from '../config/env';
-import path from "path";
 
 const { audioData: AudioDataModel } = models;
 
@@ -104,13 +104,21 @@ export default class PigService {
           return [audioData];
         }
         const proc = ffmpeg({ source: ytdl(url) });
+        if (config.ffmpegPath) {
+          proc.setFfmpegPath(config.ffmpegPath);
+        }
         return Promise.all([
-          this.audioDataDao.saveAudioData(AudioDataModel.build({ type: 'YOUTUBE', fileId, pathToFile }).get()),
-          new Promise((resolve, reject) => proc.saveToFile(fullPath).on('end', resolve).on('error', reject)),
+          AudioDataModel.build({ type: 'YOUTUBE', fileId, pathToFile }).validate(),
+          new Promise((resolve, reject) => proc.saveToFile(fullPath)
+            .on('end', () => resolve())
+            .on('error', err => reject(err))),
         ]);
       })
-      .then(([audioData]) => Promise.all([audioData.get(), this.queue.addToQueue(audioData.get())]))
-      .then(([audioData]) => audioData)
+      .then(([audioData]) => Promise.all([
+        this.audioDataDao.saveAudioData(audioData.get()),
+        this.queue.addToQueue(audioData.get()),
+      ]))
+      .then(([audioData]) => audioData.get())
       .catch(err => console.error(err));
   }
 
