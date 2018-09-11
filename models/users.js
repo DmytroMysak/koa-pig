@@ -45,7 +45,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
-      userName: {
+      username: {
         type: DataTypes.STRING(100),
         allowNull: true,
       },

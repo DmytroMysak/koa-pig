@@ -1,9 +1,9 @@
 import fs from 'fs';
-import localTunnelPromise from './localTunnelPromise';
+import ngrok from 'ngrok';
 import config from './config/env';
+import sequelize from './models';
 // import PigService from './businessLogic/pigBL';
 import TelegramBot from './businessLogic/bots/TelegramBot';
-
 // const pigService = new PigService();
 
 // function to go over all bots and start them
@@ -24,9 +24,10 @@ if (!fs.existsSync(config.folderToSaveLogs)) {
   fs.mkdirSync(config.folderToSaveLogs);
 }
 
-localTunnelPromise(config.port)
-  .then(result => Promise.all([
-    result.url,
+ngrok.connect(config.port)
+  .then(url => Promise.all([url, sequelize.authenticate()]))
+  .then(([url]) => Promise.all([
+    url,
     // pigService.updateVoice()
   ]))
   .then(url => startBots(url))

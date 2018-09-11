@@ -1,11 +1,7 @@
 import _ from 'lodash';
-import moment from 'moment';
-import { v4 as uuidv4 } from 'uuid';
 import ytdl from 'ytdl-core';
-import ffmpeg from 'fluent-ffmpeg';
-import path from 'path';
 import Polly from './awsBL';
-import Audio from './audioBL';
+import AudioService from './audioBL';
 import { models } from '../models/index';
 import VoicesDao from '../dataAccess/VoicesDao';
 import ChatDataDao from '../dataAccess/ChatDataDao';
@@ -14,7 +10,7 @@ import Queue from './queueBL';
 import config from '../config/env';
 import logger from '../helper/logger';
 
-const { audioData: AudioDataModel, voices: VoicesModel } = models;
+const { voices: VoicesModel } = models;
 
 export default class PigService {
   constructor() {
@@ -22,58 +18,41 @@ export default class PigService {
     this.chatDataDao = new ChatDataDao(models);
     this.audioDataDao = new AudioDataDao(models);
     this.queue = new Queue();
-    this.audio = new Audio();
+    this.audioService = new AudioService();
   }
 
   pigSpeakText(chatData, user) {
-    const params = {
-      OutputFormat: 'mp3',
-      Text: chatData.text,
-      VoiceId: chatData.voiceId,
-    };
-    const pathToFile = `/${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
-
     return this.audioDataDao.getAudioDataByText({ text: chatData.text, voiceId: chatData.voiceId })
       .then((audioData) => {
         if (!_.isEmpty(audioData)) {
           return [audioData];
         }
-
-        // get audio stream from aws
-        return Promise.all([
-          AudioDataModel.build({ id: uuidv4(), voiceId: chatData.voiceId, pathToFile }).validate(),
-          Polly.synthesizeSpeech(params).promise(),
-        ]);
+        return Promise.all([null, this.audioService.saveAudioToFileFromText(chatData.text, chatData.voiceId)]);
       })
-      .then(([audioData, audioStream]) => {
-        if (_.isEmpty(audioStream)) {
-          return [audioData];
+      .then(([audioData, fileName]) => {
+        if (_.isEmpty(fileName)) {
+          return audioData;
         }
-
-        // save audioStream to file + audio_id to db
-        return Promise.all([
-          this.audioDataDao.saveAudioData(audioData.get()),
-          this.audio.saveStreamToFile(audioData.get(), audioStream.AudioStream),
-        ]);
+        return this.audioDataDao.saveAudioData({ type: 'AWS', voiceId: chatData.voiceId, fileName });
       })
-      .then(([audioData]) => Promise.all([
+      .then(audioData => Promise.all([
         audioData.get(),
         this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
-        this.queue.addToQueue({ ...audioData.get(), volume: user.volume }),
+      ]))
+      .then(([audioData]) => Promise.all([
+        audioData,
+        this.queue.addToQueue({ ...audioData, volume: user.volume }),
       ]))
       .then(([audioData]) => audioData)
       .catch(err => console.error(err));
   }
 
   updateVoice() {
-    const voicesDao = new VoicesDao(models);
-
     return Polly.describeVoices()
       .promise()
       .then((data) => {
         logger.info('voices initialized');
         logger.info(data);
-
         return Promise.all(data.Voices
           .map(voice => VoicesModel.build({
             id: voice.Id,
@@ -84,65 +63,63 @@ export default class PigService {
           }))
           .map(voice => voice.validate()),
         )
-          .then(voices => Promise.all(voices.map(voice => voicesDao.upsertVoice(voice.get()))));
+          .then(voices => Promise.all(voices.map(voice => this.voicesDao.upsertVoice(voice.get()))));
       });
   }
 
   pigSpeakAudio(fileId, getFileUrl, user) {
-    const pathToFile = `/${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
-
     return this.audioDataDao.getAudioDataByFileId(fileId)
       .then((audioData) => {
         if (!_.isEmpty(audioData)) {
           return [audioData];
         }
-
-        return Promise.all([
-          AudioDataModel.build({ type: 'TELEGRAM', fileId, pathToFile }).validate(),
-          getFileUrl(),
-        ]);
+        return Promise.all([null, getFileUrl()]);
       })
       .then(([audioData, fileUrl]) => {
         if (_.isEmpty(fileUrl)) {
           return [audioData];
         }
-
+        const songFormat = fileUrl.match(/\.[0-9a-z]+$/i)[0];
+        const formatToMp3 = songFormat !== config.songFormat;
+        return Promise.all([null, formatToMp3, this.audioService.saveAudioToFileFromUrl(fileUrl)]);
+      })
+      .then(([audioData, formatToMp3, fileName]) => {
+        if (!_.isEmpty(audioData)) {
+          return [audioData];
+        }
         return Promise.all([
-          this.audioDataDao.saveAudioData(audioData.get()),
-          this.audio.saveAudioToFileFromUrl(audioData, fileUrl),
+          this.audioDataDao.saveAudioData({ type: 'TELEGRAM', fileId, fileName }),
+          formatToMp3 ? this.audioService.transformToMp3(fileName) : null,
         ]);
       })
-      .then(([audioData]) => Promise.all([audioData.get(), this.queue.addToQueue({ ...audioData.get(), volume: user.volume })]))
+      .then(([audioData]) => Promise.all([
+        audioData.get(),
+        this.queue.addToQueue({ ...audioData.get(), volume: user.volume }),
+      ]))
       .then(([audioData]) => audioData)
       .catch(err => console.error(err));
   }
 
   pigSpeakFromUrl(url, user) {
-    const pathToFile = `/${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
-    const fullPath = path.normalize(`${__dirname}/../..${pathToFile}`);
     const fileId = url.match(/(?<=v=).*$/)[0];
-
     return this.audioDataDao.getAudioDataByFileId(fileId)
       .then((audioData) => {
         if (!_.isEmpty(audioData)) {
           return [audioData];
         }
-        const proc = ffmpeg({ source: ytdl(url) });
-        if (config.ffmpegPath) {
-          proc.setFfmpegPath(config.ffmpegPath);
-        }
-        return Promise.all([
-          AudioDataModel.build({ type: 'YOUTUBE', fileId, pathToFile }).validate(),
-          new Promise((resolve, reject) => proc.saveToFile(fullPath)
-            .on('end', () => resolve())
-            .on('error', err => reject(err))),
-        ]);
+        return Promise.all([null, this.audioService.saveMp4StreamToFile(ytdl(url))]);
       })
-      .then(([audioData]) => Promise.all([
-        this.audioDataDao.saveAudioData(audioData.get()),
+      .then(([audioData, fileName]) => {
+        if (_.isEmpty(fileName)) {
+          return audioData;
+        }
+        return this.audioDataDao.saveAudioData({ type: 'YOUTUBE', fileId, fileName });
+      })
+      .then(audioData => Promise.all([
+        audioData.get(),
         this.queue.addToQueue({ ...audioData.get(), volume: user.volume }),
       ]))
-      .then(([audioData]) => audioData.get())
+      .then(([audioData]) => audioData)
       .catch(err => console.error(err));
   }
 

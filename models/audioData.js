@@ -9,7 +9,7 @@ export default (sequelize, DataTypes) => {
         unique: true,
         defaultValue: sequelize.literal('uuid_generate_v4()'),
       },
-      pathToFile: {
+      fileName: {
         type: DataTypes.TEXT,
         allowNull: false,
       },

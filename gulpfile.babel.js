@@ -15,7 +15,6 @@ const paths = {
     'route/*.js',
     'helper/*.js',
     './index.js',
-    './localTunnelPromise.js',
     '!dist/**',
     '!node_modules/**',
   ],

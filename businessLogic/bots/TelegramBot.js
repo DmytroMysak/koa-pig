@@ -55,6 +55,7 @@ export default class TelegramBot extends Bot {
     this.bot.on('callback_query', ctx => this.workWithCallbackQuery(ctx));
     this.bot.on('text', ctx => this.workWithText(ctx));
     this.bot.on('audio', ctx => this.workWithAudio(ctx));
+    this.bot.on('voice', ctx => this.workWithVoice(ctx));
     this.bot.on('document', ctx => this.workWithDocument(ctx));
     this.bot.catch((err) => {
       if (err) {
@@ -63,9 +64,15 @@ export default class TelegramBot extends Bot {
     });
   }
 
-  workWithAudio(ctx) {
-    const fileId = ctx.message.audio.file_id;
-    return this.pigService.pigSpeakAudio(fileId, () => ctx.telegram.getFileLink(ctx.message.audio), ctx.user)
+  workWithAudio(ctx, data = null) {
+    const fileId = data.file_id || ctx.message.audio.file_id;
+    return this.pigService.pigSpeakAudio(fileId, () => ctx.telegram.getFileLink(data || ctx.message.audio), ctx.user)
+      .then(() => ctx.reply('Done'));
+  }
+
+  workWithVoice(ctx) {
+    const fileId = ctx.message.voice.file_id;
+    return this.pigService.pigSpeakAudio(fileId, () => ctx.telegram.getFileLink(ctx.message.voice), ctx.user)
       .then(() => ctx.reply('Done'));
   }
 
@@ -81,14 +88,14 @@ export default class TelegramBot extends Bot {
     return ChatDataModel.build({ text, voiceId: ctx.user.selectedVoiceId || config.defaultVoiceId, userId: ctx.user.id })
       .validate()
       .then(chatData => this.pigService.pigSpeakText(chatData.get(), ctx.user))
-      .then(audioData => ctx.replyWithAudio({ source: path.normalize(`${__dirname}/../../..${audioData.pathToFile}`) }));
+      .then(audioData => ctx.replyWithAudio({ source: this.audio.getFullPathToFile(audioData.fileName) }));
   }
 
   workWithDocument(ctx) {
     if (ctx.message.document.mime_type !== 'audio/mp3') {
       return ctx.reply('І що мені з цим робити?');
     }
-    return this.workWithAudio(ctx);
+    return this.workWithAudio(ctx, ctx.message.document);
   }
 
   workWithCallbackQuery(ctx) {
@@ -117,7 +124,7 @@ export default class TelegramBot extends Bot {
       return next();
     }
     const {
-      user_name: userName, first_name: firstName, last_name: lastName, id: telegramId,
+      username, first_name: firstName, last_name: lastName, id: telegramId,
     } = ctx.from;
 
     return this.userDao.getUserByTelegramId(telegramId.toString())
@@ -126,7 +133,7 @@ export default class TelegramBot extends Bot {
           return user;
         }
         return this.userDao.addUser({
-          telegramId: telegramId.toString(), userName, firstName, lastName,
+          telegramId: telegramId.toString(), username, firstName, lastName,
         });
       })
       .then((user) => {
