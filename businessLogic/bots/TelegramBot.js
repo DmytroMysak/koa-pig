@@ -137,7 +137,7 @@ export default class TelegramBot extends Bot {
   }
 
   initMiddleware(ctx, next) {
-    if (!ctx.message || ctx.message.text.startsWith('/')) {
+    if (!ctx.message || !ctx.message.text || ctx.message.text.startsWith('/')) {
       return next();
     }
     ctx.reply('Processing...');
