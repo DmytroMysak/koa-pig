@@ -2,16 +2,17 @@ import Player from 'play-sound';
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
-import logger from '../helper/logger';
-import config from '../config/env';
+
+let instance = null;
 
 export default class Audio {
   constructor() {
-    // Create the songs directory if it does not exist
-    if (!fs.existsSync(config.folderToSaveSongs)) {
-      fs.mkdirSync(config.folderToSaveSongs);
+    if (!instance) {
+      instance = this;
     }
     this.player = new Player();
+    this.currentPlayer = null;
+    return instance;
   }
 
   saveStreamToFile(audioData, stream) {
@@ -40,11 +41,20 @@ export default class Audio {
 
   playSong(audioData) {
     const pathToFile = path.normalize(`${__dirname}/../..${audioData.pathToFile}`);
-    return new Promise((resolve, reject) => this.player.play(pathToFile, (err) => {
-      if (err) {
-        reject(err);
-      }
-      resolve();
-    }));
+    return new Promise((resolve, reject) => {
+      this.currentPlayer = this.player.play(pathToFile, { mplayer: [`volume=${audioData.volume || -1}`] }, (err) => {
+        if (!err || err === 1) {
+          // err === 1 ==> force stop player
+          this.currentPlayer = null;
+          return resolve();
+        }
+        return reject(err);
+      });
+    });
+  }
+
+  stopSong() {
+    this.currentPlayer.kill();
+    return Promise.resolve();
   }
 }

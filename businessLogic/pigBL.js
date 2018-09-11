@@ -25,7 +25,7 @@ export default class PigService {
     this.audio = new Audio();
   }
 
-  pigSpeakText(chatData) {
+  pigSpeakText(chatData, user) {
     const params = {
       OutputFormat: 'mp3',
       Text: chatData.text,
@@ -59,7 +59,7 @@ export default class PigService {
       .then(([audioData]) => Promise.all([
         audioData.get(),
         this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
-        this.queue.addToQueue(audioData.get()),
+        this.queue.addToQueue({ ...audioData.get(), volume: user.volume }),
       ]))
       .then(([audioData]) => audioData)
       .catch(err => console.error(err));
@@ -88,7 +88,7 @@ export default class PigService {
       });
   }
 
-  pigSpeakAudio(fileId, getFileUrl) {
+  pigSpeakAudio(fileId, getFileUrl, user) {
     const pathToFile = `/${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
 
     return this.audioDataDao.getAudioDataByFileId(fileId)
@@ -112,12 +112,12 @@ export default class PigService {
           this.audio.saveAudioToFileFromUrl(audioData, fileUrl),
         ]);
       })
-      .then(([audioData]) => Promise.all([audioData.get(), this.queue.addToQueue(audioData.get())]))
+      .then(([audioData]) => Promise.all([audioData.get(), this.queue.addToQueue({ ...audioData.get(), volume: user.volume })]))
       .then(([audioData]) => audioData)
       .catch(err => console.error(err));
   }
 
-  pigSpeakFromUrl(url) {
+  pigSpeakFromUrl(url, user) {
     const pathToFile = `/${config.folderToSaveSongs}/${moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
     const fullPath = path.normalize(`${__dirname}/../..${pathToFile}`);
     const fileId = url.match(/(?<=v=).*$/)[0];
@@ -140,7 +140,7 @@ export default class PigService {
       })
       .then(([audioData]) => Promise.all([
         this.audioDataDao.saveAudioData(audioData.get()),
-        this.queue.addToQueue(audioData.get()),
+        this.queue.addToQueue({ ...audioData.get(), volume: user.volume }),
       ]))
       .then(([audioData]) => audioData.get())
       .catch(err => console.error(err));

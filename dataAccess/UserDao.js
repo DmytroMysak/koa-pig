@@ -32,4 +32,15 @@ export default class UserDao {
       },
     );
   }
+
+  updateUserVolume(userId, volume) {
+    return this.users.update(
+      { volume },
+      {
+        fields: ['volume'],
+        where: { id: userId },
+        returning: true,
+      },
+    );
+  }
 }

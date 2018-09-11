@@ -21,6 +21,22 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
+      volume: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: -1,
+        isInt: {
+          msg: 'voice level bad value, expected number between -1 and 10000',
+        },
+        min: {
+          args: [-1],
+          msg: 'voice level can\'t be less than -1',
+        },
+        max: {
+          args: [10000],
+          msg: 'voice level can\'t be more than 10000',
+        },
+      },
       firstName: {
         type: DataTypes.STRING(100),
         allowNull: true,

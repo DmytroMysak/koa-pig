@@ -5,7 +5,10 @@
 ```sh
 sudo apt-get install mplayer ffmpeg;
 ```
-if you don't have postgresql install it or use remote one but don't forget to change credential in config/env file
+if you have some problem with installing ffmpeg, use static build from https://johnvansickle.com/ffmpeg/
+then add to .env file FFMPEG_PATH=/full/path/to/ffmpeg/ffmpeg
+
+if you don't have postgresql install it or use remote one but don't forget to change credential in config/env or .env file
 ```sh
 sudo apt-get install postgresql-client postgresql postgresql-contrib;
 ```
@@ -37,7 +40,6 @@ AWS_ACCESS_KEY_ID=<YOUR AWS accessKeyId>
 AWS_SECRET_ACCESS_KEY=<YOUR AWS secretAccessKey>
 AWS_REGION=<YOUR AWS REGION>
 DB_PASSWORD=<PASSWORD TO DB>
-APP_URL=<URL TO YOUR APP e.g. https://ficus.serveo.net>
 TELEGRAM_VERITY_TOKEN=<TELEGRAM_BOT_TOKEN>
 ```
 

@@ -1,11 +1,5 @@
 import winston from 'winston';
-import fs from 'fs';
 import config from '../config/env';
-
-// Create the log directory if it does not exist
-if (!fs.existsSync(config.folderToSaveLogs)) {
-  fs.mkdirSync(config.folderToSaveLogs);
-}
 
 export const options = {
   file: {

@@ -11,4 +11,12 @@ export default class Queue {
   addToQueue(audioData) {
     return this.queue.add(() => this.audio.playSong(audioData));
   }
+
+  pauseQueue() {
+    return this.queue.pause();
+  }
+
+  clearQueue() {
+    return this.queue.clear();
+  }
 }
