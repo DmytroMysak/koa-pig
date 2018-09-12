@@ -97,7 +97,7 @@ export default class Audio {
   }
 
   createFileName(fileName = null) {
-    return `_${fileName || moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
+    return `${fileName || moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
   }
 
   getFullPathToFile(fileName) {
