@@ -33,7 +33,7 @@ export default class TelegramBot extends Bot {
     this.bot.start(ctx => ctx.reply('Welcome! Write me some text. For more info use /help'));
     this.bot.help(ctx => ctx.reply(`command list:
     /menu or /m -> call menu
-    /selected or /s -> return current voice
+    /selected or /sl -> return current voice
     /change or /c -> help you to change voice change voice
     /language or /l -> return language list
     /voice or /v -> return voice list
@@ -46,7 +46,7 @@ export default class TelegramBot extends Bot {
         /volume   123 3 (set volume to 1233)
     `));
     this.bot.command(['menu', 'm'], ctx => this.menu(ctx));
-    this.bot.command(['selected', 's'], ctx => this.sendSelectedVoice(ctx));
+    this.bot.command(['selected', 'sl'], ctx => this.sendSelectedVoice(ctx));
     this.bot.command(['language', 'l'], ctx => this.sendLanguageList(ctx));
     this.bot.command(['voice', 'v'], ctx => this.sendVoiceList(ctx));
     this.bot.command(['change', 'c'], ctx => this.sendChangeVoiceInstructions(ctx));
