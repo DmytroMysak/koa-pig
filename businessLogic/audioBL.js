@@ -92,7 +92,9 @@ export default class Audio {
   }
 
   stopSong() {
-    this.currentPlayer.kill();
+    if (this.currentPlayer) {
+      this.currentPlayer.kill();
+    }
     return Promise.resolve();
   }
 
