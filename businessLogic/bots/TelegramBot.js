@@ -214,6 +214,9 @@ export default class TelegramBot extends Bot {
 
   changeUserVolume(ctx) {
     const volume = parseInt(ctx.message.text.replace(/\D/gm, ''), 10);
+    if (!volume || Number.isNaN(volume)) {
+      return ctx.reply('Bad volume value');
+    }
     return this.userDao.updateUserVolume(ctx.user.id, volume)
       .then(() => ctx.reply('Volume changed'))
       .catch(error => console.error(error));
