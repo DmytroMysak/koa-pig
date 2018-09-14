@@ -15,6 +15,11 @@ import { models } from '../../models';
 const { chatData: ChatDataModel } = models;
 
 export default class TelegramBot extends Bot {
+  /**
+   * Represents a telegram bot.
+   * @constructor
+   * @param {string} appUrl
+   */
   constructor(appUrl) {
     super();
     this.languageChangePrefix = 'language_change_';
@@ -26,6 +31,9 @@ export default class TelegramBot extends Bot {
     this.bot.telegram.setWebhook(`${appUrl}${config.telegramPath}`);
   }
 
+  /**
+   * Init all bot information (bot on event)
+   */
   init() {
     this.bot.use((ctx, next) => this.initMiddleware(ctx, next));
     this.bot.use((ctx, next) => this.userMiddleware(ctx, next));
@@ -64,18 +72,34 @@ export default class TelegramBot extends Bot {
     });
   }
 
+  /**
+   * Work with audio from message
+   * @param {object} ctx
+   * @param {object|null} data
+   * @return {Promise}
+   */
   workWithAudio(ctx, data = null) {
     const fileId = data.file_id || ctx.message.audio.file_id;
     return this.pigService.pigSpeakAudio(fileId, () => ctx.telegram.getFileLink(data || ctx.message.audio), ctx.user)
       .then(() => ctx.reply('Done'));
   }
 
+  /**
+   * Work with voice from message
+   * @param {object} ctx
+   * @return {Promise}
+   */
   workWithVoice(ctx) {
     const fileId = ctx.message.voice.file_id;
     return this.pigService.pigSpeakAudio(fileId, () => ctx.telegram.getFileLink(ctx.message.voice), ctx.user)
       .then(() => ctx.reply('Done'));
   }
 
+  /**
+   * Work with text from message
+   * @param {object} ctx
+   * @return {Promise}
+   */
   workWithText(ctx) {
     const { message: { text } } = ctx;
     if (validator.isUrl(text) && !text.includes('youtube')) {
@@ -91,6 +115,11 @@ export default class TelegramBot extends Bot {
       .then(audioData => ctx.replyWithAudio({ source: this.audio.getFullPathToFile(audioData.fileName) }));
   }
 
+  /**
+   * Work with document from message
+   * @param {object} ctx
+   * @return {Promise}
+   */
   workWithDocument(ctx) {
     if (ctx.message.document.mime_type !== 'audio/mp3') {
       return ctx.reply('І що мені з цим робити?');
@@ -98,6 +127,11 @@ export default class TelegramBot extends Bot {
     return this.workWithAudio(ctx, ctx.message.document);
   }
 
+  /**
+   * Work with inline button response
+   * @param {object} ctx
+   * @return {Promise}
+   */
   workWithCallbackQuery(ctx) {
     if (ctx.callbackQuery.data === '/s') {
       return this.sendSelectedVoice(ctx);
@@ -119,6 +153,11 @@ export default class TelegramBot extends Bot {
     return ctx.reply('І що мені з цим робити?');
   }
 
+  /**
+   * Middleware to save user in db & add to context (ctx) for every request
+   * @param {object} ctx
+   * @param next
+   */
   userMiddleware(ctx, next) {
     if (!ctx.from) {
       return next();
@@ -143,6 +182,11 @@ export default class TelegramBot extends Bot {
       .catch(err => console.error(err));
   }
 
+  /**
+   * Middleware to send default response for message & log message data
+   * @param {object} ctx
+   * @param next
+   */
   initMiddleware(ctx, next) {
     if (!ctx.message || !ctx.message.text || ctx.message.text.startsWith('/')) {
       return next();
@@ -152,6 +196,11 @@ export default class TelegramBot extends Bot {
     return next();
   }
 
+  /**
+   * Send menu for user
+   * @param {{reply}} ctx
+   * @return {Promise}
+   */
   menu({ reply }) {
     return reply('MENU', Extra.HTML().markup(m => m.inlineKeyboard([
       [Markup.callbackButton('Selected voice', '/s'), Markup.callbackButton('Change voice', '/c')],
@@ -159,6 +208,11 @@ export default class TelegramBot extends Bot {
     ])));
   }
 
+  /**
+   * Send instruction how to change voice
+   * @param {object} ctx
+   * @return {Promise}
+   */
   sendChangeVoiceInstructions(ctx) {
     const text = `You have 2 options to change voice:
     - Press 'Language list' button, select language then select voice.
@@ -168,6 +222,11 @@ export default class TelegramBot extends Bot {
     ])));
   }
 
+  /**
+   * Send user selected voice
+   * @param {object} ctx
+   * @return {Promise}
+   */
   sendSelectedVoice(ctx) {
     if (!ctx.user.voice) {
       return ctx.reply(`${config.defaultVoiceId}(Male, Russian)`);
@@ -176,6 +235,11 @@ export default class TelegramBot extends Bot {
     return ctx.reply(`${voice.name}(${voice.gender}, ${voice.languageName})`);
   }
 
+  /**
+   * Send all available language
+   * @param {object} ctx
+   * @return {Promise}
+   */
   sendLanguageList(ctx) {
     return this.pigService.getLanguagesList(true)
       .then((languageList) => {
@@ -187,6 +251,12 @@ export default class TelegramBot extends Bot {
       .catch(error => console.error(error));
   }
 
+  /**
+   * Send all available voice
+   * @param {object} ctx
+   * @param {string} languageId
+   * @return {Promise}
+   */
   sendVoiceList(ctx, languageId = null) {
     return this.pigService.getVoicesList(languageId)
       .then((voiceList) => {
@@ -198,6 +268,14 @@ export default class TelegramBot extends Bot {
       .catch(error => console.error(error));
   }
 
+  /**
+   * Template for creating inline keyboard
+   * @param {Array} list
+   * @param {number} chuckSize
+   * @param {function} buttonNameFunction
+   * @param {function} buttonIdFunction
+   * @return {string}
+   */
   createInlineKeyboard(list, chuckSize, buttonNameFunction, buttonIdFunction) {
     const chuckedArray = new Array(Math.ceil(list.length / chuckSize)).fill().map(() => list.splice(0, chuckSize));
     return Extra.HTML().markup(m => m.inlineKeyboard(
@@ -205,12 +283,23 @@ export default class TelegramBot extends Bot {
     ));
   }
 
+  /**
+   * change user voice by voiceId
+   * @param {object} ctx
+   * @param {string} voiceId
+   * @return {Promise}
+   */
   changeUserVoice(ctx, voiceId) {
     return this.userDao.updateUserVoiceId(ctx.user.id, voiceId)
       .then(() => ctx.reply('Voice changed'))
       .catch(error => console.error(error));
   }
 
+  /**
+   * change user volume
+   * @param {object} ctx
+   * @return {Promise}
+   */
   changeUserVolume(ctx) {
     const volume = parseInt(ctx.message.text.replace(/\D/gm, ''), 10);
     if (!volume || Number.isNaN(volume)) {
@@ -221,8 +310,13 @@ export default class TelegramBot extends Bot {
       .catch(error => console.error(error));
   }
 
+  /**
+   * start telegram bot
+   * @return {Promise}
+   */
   start() {
     this.init();
     this.bot.startWebhook(config.telegramPath, null, config.port);
+    return Promise.resolve();
   }
 }

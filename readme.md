@@ -18,7 +18,7 @@ sudo -u postgres createuser -D -A -P littlePig;
 ```
 Create new DB
 ```sh
-sudo -u postgres createuser -D -A -P littlePig;
+sudo -u postgres createdb -O littlePig little_pig;
 ```
 add extension to new DB
 ```sh
