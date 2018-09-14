@@ -3,7 +3,6 @@ const sourcemaps = require('gulp-sourcemaps');
 const changed = require('gulp-changed');
 const babel = require('gulp-babel');
 const del = require('del');
-const path = require('path');
 
 const paths = {
   js: [

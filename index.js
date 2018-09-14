@@ -2,9 +2,9 @@ import fs from 'fs';
 import ngrok from 'ngrok';
 import config from './config/env';
 import sequelize from './models';
-// import PigService from './businessLogic/pigBL';
+import PigService from './businessLogic/pigBL';
 import TelegramBot from './businessLogic/bots/TelegramBot';
-// const pigService = new PigService();
+const pigService = new PigService();
 
 // function to go over all bots and start them
 const startBots = (appUrl) => {
@@ -28,7 +28,7 @@ ngrok.connect(config.port)
   .then(url => Promise.all([url, sequelize.authenticate()]))
   .then(([url]) => Promise.all([
     url,
-    // pigService.updateVoice()
+    pigService.updateVoice()
   ]))
   .then(url => startBots(url))
   .catch(err => console.error(err));

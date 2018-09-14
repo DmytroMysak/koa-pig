@@ -3,7 +3,6 @@ import Telegraf from 'telegraf';
 import Markup from 'telegraf/markup';
 import Extra from 'telegraf/extra';
 import _ from 'lodash';
-import path from 'path';
 import Bot from './Bot';
 import Audio from '../audioBL';
 import logger from '../../helper/logger';
