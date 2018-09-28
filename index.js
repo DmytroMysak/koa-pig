@@ -1,5 +1,5 @@
 import fs from 'fs';
-import ngrok from 'ngrok';
+import { connect } from 'ngrok';
 import config from './config/env';
 import sequelize from './models';
 // import PigService from './businessLogic/pigBL';
@@ -11,7 +11,7 @@ const startBots = (appUrl) => {
   const telegramBot = new TelegramBot(appUrl);
 
   return Promise.all([
-    telegramBot.start(appUrl),
+    telegramBot.start(),
   ]);
 };
 
@@ -24,7 +24,7 @@ if (!fs.existsSync(config.folderToSaveLogs)) {
   fs.mkdirSync(config.folderToSaveLogs);
 }
 
-ngrok.connect(config.port)
+connect(config.port)
   .then(url => Promise.all([url, sequelize.authenticate()]))
   .then(([url]) => Promise.all([
     url,
