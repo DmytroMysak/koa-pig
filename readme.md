@@ -49,3 +49,20 @@ Don't forget to use AWS POLLY.
 
 to start app enter:
 ./start-prod.sh
+
+## TODO
+
+- [x] delete unused package
+     - axios
+     - body-parser
+     - compression
+     - cors
+     - express
+     - express-winston
+     - helmet
+- [x] ngrock own wrapper or use ngrock analog
+- [ ] use mjs or require(to delete gulp, babel etc)
+- [ ] change winston
+- [ ] pm2 analog
+- [ ] add funny response for sticker or photo
+

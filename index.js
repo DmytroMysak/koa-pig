@@ -1,5 +1,6 @@
 import fs from 'fs';
-import { connect } from 'ngrok';
+// import { connect } from 'ngrok';
+import Tunnel from './businessLogic/httpsTunnel/Tunnel';
 import config from './config/env';
 import sequelize from './models';
 // import PigService from './businessLogic/pigBL';
@@ -24,7 +25,10 @@ if (!fs.existsSync(config.folderToSaveLogs)) {
   fs.mkdirSync(config.folderToSaveLogs);
 }
 
-connect(config.port)
+const tunnel = new Tunnel(config.port);
+
+// connect(config.port)
+tunnel.createTunnel()
   .then(url => Promise.all([url, sequelize.authenticate()]))
   .then(([url]) => Promise.all([
     url,
