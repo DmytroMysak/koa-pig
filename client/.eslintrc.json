@@ -1,0 +1,10 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "function-paren-newline": "off",
+    "max-len": [
+      2,
+      125
+    ]
+  }
+}
