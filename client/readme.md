@@ -1,4 +1,13 @@
-# bot-pig
+# bot-pig client
+Just speak and cache song
+
+## Goal
+- easy install
+- have queue
+- have unique identify
+
+
+// old
 
 ## Install
 

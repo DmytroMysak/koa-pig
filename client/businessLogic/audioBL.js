@@ -1,10 +1,7 @@
 import Player from 'play-sound';
 import fs from 'fs';
-import https from 'https';
+import { promisify } from 'util';
 import path from 'path';
-import moment from 'moment';
-import ffmpeg from 'fluent-ffmpeg';
-import Polly from './awsBL';
 import config from '../config/env';
 import logger from '../helper/logger';
 
@@ -20,22 +17,18 @@ export default class Audio {
     return instance;
   }
 
-  saveMp4StreamToFile(stream, nameOfFile = null) {
-    const proc = ffmpeg({ source: stream });
-    if (config.ffmpegPath) {
-      proc.setFfmpegPath(config.ffmpegPath);
-    }
-    const fileName = this.createFileName(nameOfFile);
-    const fullPath = this.getFullPathToFile(fileName);
-    return new Promise((resolve, reject) => proc.saveToFile(fullPath)
-      .on('end', () => resolve(fileName))
-      .on('error', err => reject(err)));
+  static createFullPathToFile(fileName) {
+    return path.normalize(`${__dirname}/../${config.folderToSaveSongs}/${fileName}`);
   }
 
-  saveStreamToFile(stream, nameOfFile = null) {
+  static isFileExist(fileName) {
+    const isExists = promisify(fs.exists);
+    return isExists(Audio.createFullPathToFile(fileName));
+  }
+
+  static saveStreamToFile(stream, fileName) {
     return new Promise((resolve, reject) => {
-      const fileName = this.createFileName(nameOfFile);
-      const fullPath = this.getFullPathToFile(fileName);
+      const fullPath = Audio.createFullPathToFile(fileName);
       const writeStream = fs.createWriteStream(fullPath);
       writeStream.end(stream);
       writeStream
@@ -44,42 +37,8 @@ export default class Audio {
     }).catch(err => logger.error(err));
   }
 
-  saveAudioToFileFromUrl(url, nameOfFile = null) {
-    return new Promise((resolve, reject) => {
-      https.get(url, (response) => {
-        const fileName = this.createFileName(nameOfFile);
-        const fullPath = this.getFullPathToFile(fileName);
-        const writeStream = fs.createWriteStream(fullPath);
-        response.pipe(writeStream);
-        writeStream
-          .on('finish', () => resolve(fileName))
-          .on('error', err => reject(err));
-      });
-    }).catch(err => logger.error(err));
-  }
-
-  saveAudioToFileFromText(text, voiceId) {
-    const params = {
-      OutputFormat: 'mp3',
-      Text: text,
-      VoiceId: voiceId || config.defaultVoiceId,
-    };
-    return Polly.synthesizeSpeech(params).promise()
-      .then(stream => this.saveStreamToFile(stream.AudioStream));
-  }
-
-  transformToMp3(fileName) {
-    const proc = ffmpeg(this.getFullPathToFile(fileName));
-    if (config.ffmpegPath) {
-      proc.setFfmpegPath(config.ffmpegPath);
-    }
-    return new Promise((resolve, reject) => proc.toFormat('mp3').save(this.getFullPathToFile(fileName))
-      .on('end', () => resolve())
-      .on('error', err => reject(err)));
-  }
-
   playSong(audioData) {
-    const fullPath = this.getFullPathToFile(audioData.fileName);
+    const fullPath = Audio.createFullPathToFile(audioData.fileName);
     return new Promise((resolve, reject) => {
       this.currentPlayer = this.player.play(fullPath, { mplayer: ['-volume', audioData.volume || -1] }, (err) => {
         if (!err || err === 1) {
@@ -97,13 +56,5 @@ export default class Audio {
       this.currentPlayer.kill();
     }
     return Promise.resolve();
-  }
-
-  createFileName(fileName = null) {
-    return `${fileName || moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
-  }
-
-  getFullPathToFile(fileName) {
-    return path.normalize(`${__dirname}/../../${config.folderToSaveSongs}/${fileName}`);
   }
 }
