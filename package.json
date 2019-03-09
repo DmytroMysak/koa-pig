@@ -1,0 +1,11 @@
+{
+  "name": "koa-pig",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:DmytroMysak/koa-pig.git",
+  "author": "Dmytro Mysak <dmytro.mysak@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^6.1.3"
+  }
+}

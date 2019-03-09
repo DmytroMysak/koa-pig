@@ -17,39 +17,19 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING(40),
         allowNull: false,
       },
-      date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: sequelize.literal('now()'),
-      },
       userId: {
         type: DataTypes.UUID,
         allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-      },
-      voiceId: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        references: {
-          model: 'voices',
-          key: 'id',
-        },
       },
       audioId: {
         type: DataTypes.UUID,
         allowNull: true,
-        references: {
-          model: 'audioData',
-          key: 'id',
-        },
       },
     },
     {
       tableName: 'chatData',
-      timestamps: false,
+      timestamps: true,
+      createdat: 'createdAt',
     },
   );
   chatData.associate = (models) => {

@@ -15,15 +15,17 @@ if (!fs.existsSync(config.folderToSaveLogs)) {
   fs.mkdirSync(config.folderToSaveLogs);
 }
 
-const ws = new WebSocket(config.appUrl);
+const ws = new WebSocket(config.appUrl, {
+  headers: { token: config.secretKey },
+});
 
-ws.on('open', () => ws.send({ type: 'start', payload: { secretKey: config.secretKey } }));
+// ws.on('open', () => ws.send({ type: 'start', payload: { secretKey: config.secretKey } }));
 
 ws.on('message', (data) => {
   logger.debug(data);
 
   switch (data.type) {
-    case 'hash':
+    case 'songExist':
       pigService.pigSpeakIfExist(data)
         .then(result => result ? null : ws.send(JSON.stringify({ event: 'get_file', hash: data.hash })));
       break;

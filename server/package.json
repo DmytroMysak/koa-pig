@@ -32,13 +32,12 @@
     "fluent-ffmpeg": "^2.1.2",
     "lodash": "^4.17.10",
     "moment": "^2.22.1",
-    "p-queue": "^3.0.0",
     "pg": "^7.4.3",
     "pino": "^5.10.6",
-    "play-sound": "^1.1.2",
     "pm2": "^3.0.4",
     "sequelize": "^4.38.0",
     "telegraf": "^3.21.2",
+    "ws": "^6.1.2",
     "ytdl-core": "^0.26.0"
   },
   "devDependencies": {

@@ -1,150 +1,93 @@
-import _ from 'lodash';
 import ytdl from 'ytdl-core';
-import Polly from './awsBL';
 import AudioService from './audioBL';
-import { models } from '../models/index';
-import VoicesDao from '../dataAccess/VoicesDao';
-import ChatDataDao from '../dataAccess/ChatDataDao';
-import AudioDataDao from '../dataAccess/AudioDataDao';
-import Queue from './queueBL';
+import ChatService from './chatBL';
 import config from '../config/env';
-import logger from '../helper/logger';
-
-const { voices: VoicesModel } = models;
 
 export default class PigService {
-  constructor() {
-    this.voicesDao = new VoicesDao(models);
-    this.chatDataDao = new ChatDataDao(models);
-    this.audioDataDao = new AudioDataDao(models);
-    this.queue = new Queue();
+  constructor(webSocketClientList) {
+    this.chatService = new ChatService();
     this.audioService = new AudioService();
+    this.webSocketClientList = webSocketClientList;
   }
 
-  pigSpeakText(chatData, user) {
-    return this.audioDataDao.getAudioDataByText({ text: chatData.text, voiceId: chatData.voiceId })
-      .then((audioData) => {
-        if (!_.isEmpty(audioData)) {
-          return [audioData];
-        }
-        return Promise.all([null, this.audioService.saveAudioToFileFromText(chatData.text, chatData.voiceId)]);
-      })
-      .then(([audioData, fileName]) => {
-        if (_.isEmpty(fileName)) {
-          return audioData;
-        }
-        return this.audioDataDao.saveAudioData({ type: 'AWS', voiceId: chatData.voiceId, fileName });
-      })
-      .then(audioData => Promise.all([
-        audioData.get(),
-        this.chatDataDao.saveChatData({ ...chatData, audioId: audioData.get('id') }),
-      ]))
-      .then(([audioData]) => Promise.all([
-        audioData,
-        this.queue.addToQueue({ ...audioData, volume: user.volume }),
-      ]))
-      .then(([audioData]) => audioData)
-      .catch(err => logger.error(err));
+  processResponseFromClient(clientId) {
+    this.webSocketClientList[clientId].on('message', (data) => {
+      if (data.type === 'songExist' && data.status === false) {
+        this.sendSongToClient(data.hash, data.upgradeReq.token);
+      }
+    });
   }
 
-  updateVoice() {
-    return Polly.describeVoices()
-      .promise()
-      .then((data) => {
-        logger.info('voices initialized');
-        logger.info(data);
-        return Promise.all(data.Voices
-          .map(voice => VoicesModel.build({
-            id: voice.Id,
-            gender: voice.Gender,
-            languageCode: voice.LanguageCode,
-            languageName: voice.LanguageName,
-            name: voice.Name,
-          }))
-          .map(voice => voice.validate()),
-        )
-          .then(voices => Promise.all(voices.map(voice => this.voicesDao.upsertVoice(voice.get()))));
+  sendToClient(data, clientId) {
+    this.webSocketClientList[clientId].send(data);
+    this.processResponseFromClient(clientId);
+  }
+
+  sendSongToClient(hash, clientId) {
+
+  }
+
+  /**
+   * Work with text from message
+   * @param {{text: string, voiceId: string, userId: string, volume: number}} ctx
+   * @return {Promise}
+   */
+  async pigSpeakText({ text, voiceId, userId, volume, clientId }) {
+    const message = await this.chatService.saveMessage(text, userId);
+    const songExist = await this.audioService.isSongExist(message.textHash);
+
+    if (!songExist) {
+      const songData = await this.audioService.createAudioFileFromText({
+        text, voiceId, hash: message.textHash, chatId: message.id,
       });
+      await this.chatService.linkSongToMessage(message.id, songData.id);
+    } else {
+      await this.chatService.linkSongToMessageByHash(message.id, message.textHash);
+    }
+
+    if (this.webSocketClientList[clientId]) {
+      this.sendToClient({ type: 'songExist', hash: message.textHash, volume }, clientId);
+      return this.audioService.getFullPathToFile(message.textHash);
+    }
+
+    return Promise.reject(new Error(`Problem with client ${clientId}`));
   }
 
-  pigSpeakAudio(fileId, getFileUrl, user) {
-    return this.audioDataDao.getAudioDataByFileId(fileId)
-      .then((audioData) => {
-        if (!_.isEmpty(audioData)) {
-          return [audioData];
-        }
-        return Promise.all([null, getFileUrl()]);
-      })
-      .then(([audioData, fileUrl]) => {
-        if (_.isEmpty(fileUrl)) {
-          return [audioData];
-        }
-        const songFormat = fileUrl.match(/\.[0-9a-z]+$/i)[0];
-        const formatToMp3 = songFormat !== config.songFormat;
-        return Promise.all([null, formatToMp3, this.audioService.saveAudioToFileFromUrl(fileUrl)]);
-      })
-      .then(([audioData, formatToMp3, fileName]) => {
-        if (!_.isEmpty(audioData)) {
-          return [audioData];
-        }
-        return Promise.all([
-          this.audioDataDao.saveAudioData({ type: 'TELEGRAM', fileId, fileName }),
-          formatToMp3 ? this.audioService.transformToMp3(fileName) : null,
-        ]);
-      })
-      .then(([audioData]) => Promise.all([
-        audioData.get(),
-        this.queue.addToQueue({ ...audioData.get(), volume: user.volume }),
-      ]))
-      .then(([audioData]) => audioData)
-      .catch(err => logger.error(err));
-  }
-
-  pigSpeakFromUrl(url, user) {
+  async pigSpeakFromUrl({ url, userId, volume, clientId }) {
     const fileId = url.match(/(?<=v=).*$/)[0];
-    return this.audioDataDao.getAudioDataByFileId(fileId)
-      .then((audioData) => {
-        if (!_.isEmpty(audioData)) {
-          return [audioData];
-        }
-        return Promise.all([null, this.audioService.saveMp4StreamToFile(ytdl(url))]);
-      })
-      .then(([audioData, fileName]) => {
-        if (_.isEmpty(fileName)) {
-          return audioData;
-        }
-        return this.audioDataDao.saveAudioData({ type: 'YOUTUBE', fileId, fileName });
-      })
-      .then(audioData => Promise.all([
-        audioData.get(),
-        this.queue.addToQueue({ ...audioData.get(), volume: user.volume }),
-      ]))
-      .then(([audioData]) => audioData)
-      .catch(err => logger.error(err));
+    const message = await this.chatService.saveMessage(url, userId);
+    const songExist = await this.audioService.isSongExist(fileId);
+
+    if (!songExist) {
+      const songData = await this.audioService.saveMp4StreamToFile(ytdl(url), fileId, message.id);
+      await this.chatService.linkSongToMessage(message.id, songData.id);
+    } else {
+      await this.chatService.linkSongToMessageByHash(message.id, message.textHash);
+    }
+
+    if (this.webSocketClientList[clientId]) {
+      this.sendToClient({ type: 'songExist', hash: fileId, volume }, clientId);
+      return this.audioService.getFullPathToFile(fileId);
+    }
+
+    return Promise.reject(new Error(`Problem with client ${clientId}`));
   }
 
-  getLanguagesList(unique) {
-    return this.voicesDao.getVoices(unique)
-      .then(data => ({
-        rows: data.rows.map(voice => ({ name: voice.languageName, code: voice.languageCode })),
-        count: data.count.length,
-      }))
-      .catch(err => logger.error(err));
-  }
+  async pigSpeakAudio({ fileId, getFileUrl, volume, clientId }) {
+    const songExist = await this.audioService.isSongExist(fileId);
 
-  getVoicesList(languageCode = null) {
-    const filter = {
-      ...languageCode ? { languageCode } : {},
-    };
-    return this.voicesDao.getVoices(false, filter);
-  }
+    if (!songExist) {
+      const fileUrl = await getFileUrl();
+      const songFormat = fileUrl.match(/\.[0-9a-z]+$/i)[0];
+      const formatToMp3 = songFormat !== config.songFormat;
+      this.audioService.saveAudioToFileFromUrl(fileUrl, fileId, formatToMp3);
+    }
 
-  getSpeakersNameList(id = null) {
-    return this.voicesDao.getVoices(false, ...id ? { languageCode: id } : {})
-      .then(data => ({
-        rows: data.rows.map(voice => ({ name: voice.name, id: voice.id, gender: voice.gender })),
-        count: data.count,
-      }))
-      .catch(err => logger.error(err));
+    if (this.webSocketClientList[clientId]) {
+      this.sendToClient({ type: 'songExist', hash: fileId, volume }, clientId);
+      return this.audioService.getFullPathToFile(fileId);
+    }
+
+    return Promise.reject(new Error(`Problem with client ${clientId}`));
   }
 }

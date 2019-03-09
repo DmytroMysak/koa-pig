@@ -1,6 +1,6 @@
 export default (sequelize, DataTypes) => {
   return sequelize.define(
-    'users',
+    'client',
     {
       id: {
         type: DataTypes.UUID,
@@ -19,7 +19,7 @@ export default (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: 'users',
+      tableName: 'client',
       timestamps: false,
     },
   );

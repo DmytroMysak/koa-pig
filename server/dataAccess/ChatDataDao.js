@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import sequelize from '../models';
 
 export default class ChatDataDao {
   constructor(models) {
@@ -10,7 +11,7 @@ export default class ChatDataDao {
   }
 
   updateChatData(id, chatDataObject, fieldsToUpdate = null) {
-    const updatedFields = _.omit(this.chatData.attributes, ['id', 'date']);
+    const updatedFields = _.omit(this.chatData.attributes, ['id', 'createdAt']);
 
     return this.chatData.update(
       chatDataObject,
@@ -21,5 +22,16 @@ export default class ChatDataDao {
       },
     )
       .then(([affectedRows, rows]) => (affectedRows && rows[0]) || {});
+  }
+
+  addAudioIdByHash(messageId, hash) {
+    return this.chatData.update(
+      { audioId: sequelize.literal(`(select id from "audioData" where "fileName" = '${hash}')`) },
+      {
+        fields: ['audioId'],
+        where: { id: messageId },
+        returning: true,
+      },
+    );
   }
 }

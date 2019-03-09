@@ -1,71 +1,90 @@
-import Player from 'play-sound';
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
-import moment from 'moment';
+import { promisify } from 'util';
 import ffmpeg from 'fluent-ffmpeg';
 import Polly from './awsBL';
 import config from '../config/env';
 import logger from '../helper/logger';
-
-let instance = null;
+import AudioDataDao from '../dataAccess/AudioDataDao';
+import { models } from '../models';
 
 export default class Audio {
   constructor() {
-    if (!instance) {
-      instance = this;
-    }
-    this.player = new Player();
-    this.currentPlayer = null;
-    return instance;
+    this.audioDataDao = new AudioDataDao(models);
   }
 
-  saveMp4StreamToFile(stream, nameOfFile = null) {
-    const proc = ffmpeg({ source: stream });
-    if (config.ffmpegPath) {
-      proc.setFfmpegPath(config.ffmpegPath);
-    }
-    const fileName = this.createFileName(nameOfFile);
-    const fullPath = this.getFullPathToFile(fileName);
-    return new Promise((resolve, reject) => proc.saveToFile(fullPath)
-      .on('end', () => resolve(fileName))
-      .on('error', err => reject(err)));
+  isSongExist(hash) {
+    const file = this.getFullPathToFile(hash);
+    const isExist = promisify(fs.exists);
+    return isExist(file);
   }
 
-  saveStreamToFile(stream, nameOfFile = null) {
-    return new Promise((resolve, reject) => {
-      const fileName = this.createFileName(nameOfFile);
-      const fullPath = this.getFullPathToFile(fileName);
-      const writeStream = fs.createWriteStream(fullPath);
-      writeStream.end(stream);
-      writeStream
-        .on('finish', () => resolve(fileName))
-        .on('error', err => reject(err));
-    }).catch(err => logger.error(err));
-  }
-
-  saveAudioToFileFromUrl(url, nameOfFile = null) {
-    return new Promise((resolve, reject) => {
-      https.get(url, (response) => {
-        const fileName = this.createFileName(nameOfFile);
-        const fullPath = this.getFullPathToFile(fileName);
-        const writeStream = fs.createWriteStream(fullPath);
-        response.pipe(writeStream);
-        writeStream
-          .on('finish', () => resolve(fileName))
-          .on('error', err => reject(err));
-      });
-    }).catch(err => logger.error(err));
-  }
-
-  saveAudioToFileFromText(text, voiceId) {
+  createAudioFileFromText({ text, hash, voiceId }) {
     const params = {
       OutputFormat: 'mp3',
       Text: text,
       VoiceId: voiceId || config.defaultVoiceId,
     };
     return Polly.synthesizeSpeech(params).promise()
-      .then(stream => this.saveStreamToFile(stream.AudioStream));
+      .then(stream => this.saveStreamToFile(stream.AudioStream, hash))
+      .then(() => this.audioDataDao.saveAudioData({
+        fileName: hash,
+        type: 'AWS',
+        fileId: text.toString().substring(0, 20),
+      }))
+      .then(audioData => audioData.get())
+      .catch(err => logger.error(err));
+  }
+
+  saveStreamToFile(stream, hash) {
+    return new Promise((resolve, reject) => {
+      const fullPath = this.getFullPathToFile(hash);
+      const writeStream = fs.createWriteStream(fullPath);
+      writeStream.end(stream);
+      writeStream
+        .on('finish', () => resolve())
+        .on('error', err => reject(err));
+    }).catch(err => logger.error(err));
+  }
+
+  saveMp4StreamToFile(stream, videoKey) {
+    const proc = ffmpeg({ source: stream });
+    if (config.ffmpegPath) {
+      proc.setFfmpegPath(config.ffmpegPath);
+    }
+    const fullPath = this.getFullPathToFile(videoKey);
+    return new Promise((resolve, reject) => proc.saveToFile(fullPath)
+      .on('end', () => resolve())
+      .on('error', err => reject(err)))
+      .then(() => this.audioDataDao.saveAudioData({
+        fileName: videoKey,
+        type: 'YOUTUBE',
+        fileId: 'youtube link',
+      }))
+      .then(audioData => audioData.get())
+      .catch(err => logger.error(err));
+  }
+
+  saveAudioToFileFromUrl(url, fileId, formatToMp3) {
+    return new Promise((resolve, reject) => {
+      https.get(url, (response) => {
+        const fullPath = this.getFullPathToFile(fileId);
+        const writeStream = fs.createWriteStream(fullPath);
+        response.pipe(writeStream);
+        writeStream
+          .on('finish', () => resolve())
+          .on('error', err => reject(err));
+      });
+    })
+      .then(() => (formatToMp3 ? this.transformToMp3(fileId) : Promise.resolve()))
+      .then(() => this.audioDataDao.saveAudioData({
+        fileName: fileId,
+        type: 'TELEGRAM',
+        fileId: 'telegram file',
+      }))
+      .then(audioData => audioData.get())
+      .catch(err => logger.error(err));
   }
 
   transformToMp3(fileName) {
@@ -78,32 +97,7 @@ export default class Audio {
       .on('error', err => reject(err)));
   }
 
-  playSong(audioData) {
-    const fullPath = this.getFullPathToFile(audioData.fileName);
-    return new Promise((resolve, reject) => {
-      this.currentPlayer = this.player.play(fullPath, { mplayer: ['-volume', audioData.volume || -1] }, (err) => {
-        if (!err || err === 1) {
-          // err === 1 ==> force stop player
-          this.currentPlayer = null;
-          return resolve();
-        }
-        return reject(err);
-      });
-    });
-  }
-
-  stopSong() {
-    if (this.currentPlayer) {
-      this.currentPlayer.kill();
-    }
-    return Promise.resolve();
-  }
-
-  createFileName(fileName = null) {
-    return `${fileName || moment().format('YYYYMMDDHHmmssSSS')}.${config.songFormat}`;
-  }
-
-  getFullPathToFile(fileName) {
-    return path.normalize(`${__dirname}/../../${config.folderToSaveSongs}/${fileName}`);
+  getFullPathToFile(hash) {
+    return path.normalize(`${__dirname}/../../${config.folderToSaveSongs}/${hash}.${config.songFormat}`);
   }
 }

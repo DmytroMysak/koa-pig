@@ -62,7 +62,7 @@ to start app enter:
      - helmet
 - [x] ngrock own wrapper or use ngrock analog
 - [ ] use mjs or require(to delete gulp, babel etc)
-- [ ] change winston
+- [x] change winston
 - [ ] pm2 analog
 - [ ] add funny response for sticker or photo
 

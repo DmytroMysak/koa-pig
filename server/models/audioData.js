@@ -10,8 +10,8 @@ export default (sequelize, DataTypes) => {
         defaultValue: sequelize.literal('uuid_generate_v4()'),
       },
       fileName: {
-        type: DataTypes.TEXT,
-        allowNull: false,
+        type: DataTypes.STRING(100),
+        allowNull: true,
       },
       voiceId: {
         type: DataTypes.STRING(100),
@@ -23,7 +23,7 @@ export default (sequelize, DataTypes) => {
         defaultValue: 'AWS',
       },
       fileId: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(20),
         allowNull: true,
       },
     },

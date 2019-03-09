@@ -4,8 +4,8 @@ export default class UserDao {
     this.voices = models.voices;
   }
 
-  addUser(voice) {
-    return this.users.create(voice);
+  addUser(user) {
+    return this.users.create(user);
   }
 
   getUserByFacebookId(facebookId) {
@@ -18,7 +18,6 @@ export default class UserDao {
   getUserByTelegramId(telegramId) {
     return this.users.findOne({
       where: { telegramId },
-      include: [{ model: this.voices, required: false }],
     });
   }
 
@@ -42,5 +41,13 @@ export default class UserDao {
         returning: true,
       },
     );
+  }
+
+  getUserVoice(userId) {
+    return this.users.findOne({
+      fields: [],
+      where: { id: userId },
+      include: [{ model: this.voices, required: false }],
+    });
   }
 }
