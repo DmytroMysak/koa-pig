@@ -3,6 +3,7 @@
 .gulp-cache
 logs/**
 songs/**
+server/songs/**
 
 # User-specific stuff
 .idea/*
