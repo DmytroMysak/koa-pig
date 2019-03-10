@@ -1,4 +1,4 @@
-import Serveo from './Serveo';
+import Serveo from './serveo';
 
 export default class Tunnel {
   constructor(port) {

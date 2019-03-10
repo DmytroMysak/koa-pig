@@ -9,11 +9,9 @@ const del = require('del');
 const paths = {
   js: [
     'config/**/*.js',
-    'controllers/**/*.js',
     'businessLogic/**/*.js',
     'dataAccess/**/*.js',
     'models/**/*.js',
-    'route/*.js',
     'helper/*.js',
     './index.js',
     '!dist/**',
@@ -33,7 +31,17 @@ gulp.task('copy', () => gulp.src(paths.nonJs)
 gulp.task('babel', () => gulp.src(paths.js, { base: '.' })
   .pipe(changed('dist'))
   .pipe(sourcemaps.init())
-  .pipe(babel({ presets: ['@babel/env'] }))
+  .pipe(babel({
+    presets: [
+      [
+        '@babel/preset-env', {
+          targets: {
+            node: 'current',
+          },
+        },
+      ],
+    ],
+  }))
   .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../' }))
   .pipe(gulp.dest('dist')));
 

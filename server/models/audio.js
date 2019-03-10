@@ -1,6 +1,6 @@
 export default (sequelize, DataTypes) => {
-  const audioData = sequelize.define(
-    'audioData',
+  const audio = sequelize.define(
+    'audio',
     {
       id: {
         type: DataTypes.UUID,
@@ -11,7 +11,8 @@ export default (sequelize, DataTypes) => {
       },
       fileName: {
         type: DataTypes.STRING(100),
-        allowNull: true,
+        unique: true,
+        allowNull: false,
       },
       voiceId: {
         type: DataTypes.STRING(100),
@@ -22,19 +23,15 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 'AWS',
       },
-      fileId: {
-        type: DataTypes.STRING(20),
-        allowNull: true,
-      },
     },
     {
-      tableName: 'audioData',
+      tableName: 'audio',
       timestamps: false,
     },
   );
-  audioData.associate = (models) => {
-    audioData.belongsTo(models.voices, { foreignKey: 'voiceId' });
-    // audioData.hasOne(models.chatData, { foreignKey: 'audioId' });
+  audio.associate = (models) => {
+    audio.belongsTo(models.voices, { foreignKey: 'voiceId' });
+    // audio.hasOne(models.messages, { foreignKey: 'audioId' });
   };
-  return audioData;
+  return audio;
 };

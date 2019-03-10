@@ -1,4 +1,5 @@
 export default {
   env: 'production',
-  port: process.env.PORT || 8080,
+  telegramPort: process.env.PORT || 8080,
+  wsPort: process.env.PORT || 7070,
 };

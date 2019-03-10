@@ -1,6 +1,6 @@
 export default (sequelize, DataTypes) => {
-  const chatData = sequelize.define(
-    'chatData',
+  const messages = sequelize.define(
+    'messages',
     {
       id: {
         type: DataTypes.UUID,
@@ -13,13 +13,9 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      textHash: {
-        type: DataTypes.STRING(40),
-        allowNull: false,
-      },
       userId: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
       },
       audioId: {
         type: DataTypes.UUID,
@@ -27,15 +23,15 @@ export default (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: 'chatData',
+      tableName: 'messages',
       timestamps: true,
       createdat: 'createdAt',
     },
   );
-  chatData.associate = (models) => {
-    chatData.belongsTo(models.users, { foreignKey: 'userId' });
-    chatData.belongsTo(models.voices, { foreignKey: 'voiceId' });
-    chatData.belongsTo(models.audioData, { as: 'audio', foreignKey: 'audioId' });
+  messages.associate = (models) => {
+    messages.belongsTo(models.users, { foreignKey: 'userId' });
+    messages.belongsTo(models.voices, { foreignKey: 'voiceId' });
+    messages.belongsTo(models.audio, { foreignKey: 'audioId' });
   };
-  return chatData;
+  return messages;
 };

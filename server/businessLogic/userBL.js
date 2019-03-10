@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import UserDao from '../dataAccess/UserDao';
+import UserDao from '../dataAccess/userDao';
 import { models } from '../models/index';
 
 export default class UserService {

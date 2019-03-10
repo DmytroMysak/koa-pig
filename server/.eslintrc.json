@@ -1,10 +1,16 @@
 {
-  "extends": "airbnb-base",
+  "extends": [
+    "airbnb-base", "plugin:security/recommended", "plugin:you-dont-need-lodash-underscore/compatible"
+  ],
+  "plugins": [
+    "security"
+  ],
   "rules": {
     "function-paren-newline": "off",
     "max-len": [
       2,
       125
-    ]
+    ],
+    "object-curly-newline": "off"
   }
 }
