@@ -6,7 +6,8 @@
   "author": "Dmytro Mysak",
   "license": "MIT",
   "scripts": {
-    "start-dev": "node index.js",
+    "build": "gulp",
+    "start-dev": "gulp run",
     "start": "gulp && better-npm-run start-prod",
     "start-dev-pm2": "gulp && better-npm-run start-dev"
   },
@@ -36,9 +37,18 @@
     "ws": "^6.1.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/register": "^7.0.0",
+    "del": "^4.0.0",
     "eslint": "^5.12.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
+    "gulp": "^4.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-changed": "^3.2.0",
+    "gulp-nodemon": "^2.4.2",
+    "gulp-sourcemaps": "^2.6.5",
     "pino-pretty": "^2.5.0"
   }
 }

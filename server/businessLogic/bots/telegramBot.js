@@ -23,7 +23,7 @@ export default class TelegramBot {
     this.userService = new UserService();
     this.voiceService = new VoiceService();
     this.appUrl = appUrl;
-    this.bot = new Telegraf(config.telegramVerifyToken, { username: 'LittlePigBot' });
+    this.bot = new Telegraf(config.telegramVerifyToken, { username: 'LittlePigBot', telegram: { webhookReply: false } });
   }
 
   /**
@@ -117,8 +117,8 @@ export default class TelegramBot {
       voiceId: ctx.user.selectedVoiceId || config.defaultVoiceId,
       userId: ctx.user.id,
     };
-    return this.serverService.processText(params, ctx.user.volume, ctx.user.clients)
-      .then(filePath => ctx.replyWithAudio({ source: filePath }));
+    return this.serverService.processText(params, ctx.user.volume, ctx.user.clients);
+    // .then(filePath => ctx.replyWithAudio({ source: filePath }));
   }
 
   /**
@@ -146,6 +146,9 @@ export default class TelegramBot {
     }
     if (ctx.callbackQuery.data === '/c') {
       return this.sendChangeVoiceInstructions(ctx);
+    }
+    if (ctx.callbackQuery.data === '/v') {
+      return this.sendVoiceList(ctx);
     }
     if (ctx.callbackQuery.data.startsWith(this.languageChangePrefix)) {
       const languageId = ctx.callbackQuery.data.replace(this.languageChangePrefix, '');

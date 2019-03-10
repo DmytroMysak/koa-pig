@@ -16,32 +16,29 @@ if (!fs.existsSync(config.folderToSaveLogs)) {
   fs.mkdirSync(config.folderToSaveLogs);
 }
 
-const ws = new WebSocket(config.appUrl, {
+const ws = new WebSocket(`ws://${config.appUrl}:${config.port}`, {
   headers: { token: config.secretKey },
 });
 
-ws.on('open', () => ws.send(JSON.stringify({ type: 'register' })));
+// ws.on('open', () => ws.send(JSON.stringify({ type: 'register' })));
 
 ws.on('message', async (data) => {
-  const doneResponse = fileId => ws.send(JSON.stringify({ type: 'done', fileId }));
   const { fileName, file: song, type, volume } = JSON.parse(data);
-  logger.debug(fileName);
-  // todo volume
+  logger.debug(data);
 
   switch (type) {
     case 'is_song_exist':
       if (await AudioService.isFileExist(fileName)) {
-        queue.addToQueue(fileName, doneResponse);
+        return queue.addToQueue({ fileName, volume });
       }
-      ws.send(JSON.stringify({ type: 'get_file', fileId: fileName }));
-      break;
+      return ws.send(JSON.stringify({ type: 'get_file', fileName }));
     case 'song':
-      await AudioService.saveStreamToFile(song, fileName);
-      queue.addToQueue(fileName, doneResponse);
-      break;
+      await AudioService.saveBufferToFile(Buffer.from(song.data), fileName);
+      return queue.addToQueue({ fileName, volume });
     default:
       logger.error('Unexpected data from server');
       logger.error(data);
-      ws.send(JSON.stringify({ event: 'client_error', hash: data.hash }));
+      ws.send(JSON.stringify({ type: 'client_error' }));
   }
 });
+logger.info('Client started');

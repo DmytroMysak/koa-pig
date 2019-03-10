@@ -11,9 +11,9 @@ export default class serverService {
    * @param polly
    */
   constructor(webSocketClientList, polly) {
-    this.clientService = new ClientService(webSocketClientList);
     this.audioService = new AudioService(polly);
     this.messageService = new MessageService();
+    this.webSocketClientList = webSocketClientList;
   }
 
   /**
@@ -34,7 +34,10 @@ export default class serverService {
       await this.audioService.saveAudioToFileFromUrl(fileUrl, fileId, formatToMp3);
     }
 
-    return Promise.all(clients.map(clientId => this.clientService.sendToClient({ fileName: fileId, volume }, clientId)));
+    return Promise.all(clients.map((clientId) => {
+      const client = this.webSocketClientList[clientId];
+      return ClientService.sendToClient({ fileName: fileId, volume }, client);
+    }));
   }
 
   /**
@@ -58,7 +61,10 @@ export default class serverService {
       await this.messageService.linkSongToMessageByFileName(message.id, fileName);
     }
 
-    return Promise.all(clients.map(clientId => this.clientService.sendToClient({ fileName, volume }, clientId)));
+    return Promise.all(clients.map((clientId) => {
+      const client = this.webSocketClientList[clientId];
+      return ClientService.sendToClient({ fileName, volume }, client);
+    }));
   }
 
   /**
@@ -81,6 +87,9 @@ export default class serverService {
       await this.messageService.linkSongToMessageByFileName(message.id, fileName);
     }
 
-    return Promise.all(clients.map(clientId => this.clientService.sendToClient({ fileName, volume }, clientId)));
+    return Promise.all(clients.map((clientId) => {
+      const client = this.webSocketClientList[clientId];
+      return ClientService.sendToClient({ fileName, volume }, client);
+    }));
   }
 }

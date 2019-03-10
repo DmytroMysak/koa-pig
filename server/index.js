@@ -8,6 +8,7 @@ import Tunnel from './businessLogic/httpsTunnel/tunnel';
 import TelegramBot from './businessLogic/bots/telegramBot';
 // import VoiceService from './businessLogic/voiceBL';
 import ServerService from './businessLogic/serverBL';
+import ClientService from './businessLogic/clientBL';
 
 // Create the songs directory if it doesn't exist
 if (!fs.existsSync(config.folderToSaveSongs)) {
@@ -21,6 +22,11 @@ if (!fs.existsSync(config.folderToSaveLogs)) {
 const webSocketClientList = {};
 
 const main = async () => {
+  AWS.config = new AWS.Config({
+    accessKeyId: config.aws.accessKeyId,
+    secretAccessKey: config.aws.secretAccessKey,
+    region: config.aws.region,
+  });
   const tunnel = new Tunnel(config.telegramPort);
   const appUrl = await tunnel.createTunnel();
   logger.info(`App url: ${appUrl}`);
@@ -29,12 +35,9 @@ const main = async () => {
   await sequelize.authenticate();
   logger.info('DataBase ok');
 
-  AWS.config = new AWS.Config({
-    accessKeyId: config.aws.accessKeyId,
-    secretAccessKey: config.aws.secretAccessKey,
-    region: config.aws.region,
-  });
   const polly = new AWS.Polly({ signatureVersion: 'v4' });
+  logger.info('AWS Polly ok');
+
   // await new VoiceService().updateVoice(polly);
   logger.info('Voices ok');
 
@@ -51,8 +54,11 @@ const main = async () => {
   });
   wss.on('connection', (ws, req) => {
     webSocketClientList[req.token] = ws;
+    ws.clientId = req.token;
     logger.debug('connected');
+    ClientService.processResponseFromClient(ws);
   });
+  logger.info('WS ok');
 
   const serverService = new ServerService(webSocketClientList, polly);
   const telegramBot = new TelegramBot(appUrl, config.telegramPort, serverService);

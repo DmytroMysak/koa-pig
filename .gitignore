@@ -4,6 +4,7 @@
 logs/**
 songs/**
 server/songs/**
+client/songs/**
 
 # User-specific stuff
 .idea/*

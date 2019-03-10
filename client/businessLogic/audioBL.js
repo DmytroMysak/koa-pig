@@ -18,7 +18,7 @@ export default class Audio {
   }
 
   static createFullPathToFile(fileName) {
-    return path.normalize(`${__dirname}/../${config.folderToSaveSongs}/${fileName}`);
+    return path.normalize(`${__dirname}/../../${config.folderToSaveSongs}/${fileName}.${config.songFormat}`);
   }
 
   static isFileExist(fileName) {
@@ -26,15 +26,12 @@ export default class Audio {
     return isExists(Audio.createFullPathToFile(fileName));
   }
 
-  static saveStreamToFile(stream, fileName) {
-    return new Promise((resolve, reject) => {
-      const fullPath = Audio.createFullPathToFile(fileName);
-      const writeStream = fs.createWriteStream(fullPath);
-      writeStream.end(stream);
-      writeStream
-        .on('finish', () => resolve(fileName))
-        .on('error', err => reject(err));
-    }).catch(err => logger.error(err));
+  static saveBufferToFile(buffer, fileName) {
+    const writeFile = promisify(fs.writeFile);
+    const fullPath = Audio.createFullPathToFile(fileName);
+    return writeFile(fullPath, buffer)
+      .then(() => fileName)
+      .catch(err => logger.error(err));
   }
 
   playSong(audioData) {
