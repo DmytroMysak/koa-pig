@@ -2,9 +2,10 @@ import fs from 'fs';
 import WebSocket from 'ws';
 import config from './config/env';
 import logger from './helper/logger';
-import PigService from './businessLogic/pigBL';
+import AudioService from './businessLogic/audioBL';
+import Queue from './businessLogic/queueBL';
 
-const pigService = new PigService();
+const queue = new Queue();
 
 // Create the songs directory if it doesn't exist
 if (!fs.existsSync(config.folderToSaveSongs)) {
@@ -19,19 +20,24 @@ const ws = new WebSocket(config.appUrl, {
   headers: { token: config.secretKey },
 });
 
-// ws.on('open', () => ws.send({ type: 'start', payload: { secretKey: config.secretKey } }));
+ws.on('open', () => ws.send(JSON.stringify({ type: 'register' })));
 
-ws.on('message', (data) => {
-  logger.debug(data);
+ws.on('message', async (data) => {
+  const doneResponse = fileId => ws.send(JSON.stringify({ type: 'done', fileId }));
+  const { fileName, file: song, type, volume } = JSON.parse(data);
+  logger.debug(fileName);
+  // todo volume
 
-  switch (data.type) {
-    case 'songExist':
-      pigService.pigSpeakIfExist(data)
-        .then(result => result ? null : ws.send(JSON.stringify({ event: 'get_file', hash: data.hash })));
+  switch (type) {
+    case 'is_song_exist':
+      if (await AudioService.isFileExist(fileName)) {
+        queue.addToQueue(fileName, doneResponse);
+      }
+      ws.send(JSON.stringify({ type: 'get_file', fileId: fileName }));
       break;
     case 'song':
-      pigService.saveAndSpeak(data)
-        .then(result => ws.send(JSON.stringify({ event: 'status', hash: data.hash, status: result })));
+      await AudioService.saveStreamToFile(song, fileName);
+      queue.addToQueue(fileName, doneResponse);
       break;
     default:
       logger.error('Unexpected data from server');
