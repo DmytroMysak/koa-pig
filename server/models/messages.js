@@ -12,9 +12,14 @@ export default (sequelize, DataTypes) => {
       text: {
         type: DataTypes.TEXT,
         allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: 'text can\'t be empty',
+          },
+        },
       },
       userId: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       audioId: {

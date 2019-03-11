@@ -26,7 +26,7 @@ const defaults = {
   ffmpegPath: process.env.FFMPEG_PATH,
   telegramPath: '/bot/telegram/webhook',
   defaultVoiceId: 'Maxim',
-  superAdminIds: [352045593],
+  superAdminIds: ['352045593'],
 };
 
 export default Object.assign(defaults, config.default);

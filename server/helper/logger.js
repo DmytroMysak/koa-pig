@@ -12,5 +12,12 @@ if (config.env !== 'development') {
   pino.destination(`${config.folderToSaveLogs}/results.log`);
 }
 
+export const telegramErrorLogging = (error, ctx) => {
+  if (error.name === 'ValidationError') {
+    logger.info(error.message);
+    return ctx.reply(error.message);
+  }
+  logger.error(error);
+};
 
 export default logger;

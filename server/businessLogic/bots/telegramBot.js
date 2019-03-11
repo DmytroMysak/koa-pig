@@ -1,7 +1,7 @@
 import Telegraf from 'telegraf';
 import Markup from 'telegraf/markup';
 import Extra from 'telegraf/extra';
-import logger from '../../helper/logger';
+import logger, { telegramErrorLogging } from '../../helper/logger';
 import validator from '../../helper/validator';
 import UserService from '../userBL';
 import VoiceService from '../voiceBL';
@@ -54,16 +54,15 @@ export default class TelegramBot {
     const {
       username, first_name: firstName, last_name: lastName, id: telegramId,
     } = ctx.from;
-    const role = config.superAdminIds.includes(telegramId) ? 'ADMIN' : 'USER';
 
     try {
       ctx.user = await this.userService.upsertUserByTelegramId({
-        telegramId: telegramId.toString(), username, firstName, lastName, role,
+        telegramId: telegramId.toString(), username, firstName, lastName,
       });
-      // todo get user clients and set to ctx.user.clients as list of client name
-      ctx.user.clients = ['xxx'];
+      ctx.user.clients = await this.userService.getUserClients(ctx.user.id);
     } catch (error) {
-      logger.error(error);
+      telegramErrorLogging(error, ctx);
+      next(error);
     }
     next();
   }
@@ -81,7 +80,7 @@ export default class TelegramBot {
       clients: ctx.user.clients,
     };
     return this.serverService.processAudio(params)
-      .then(() => ctx.reply('Done'));
+      .catch(error => telegramErrorLogging(error, ctx));
   }
 
   /**
@@ -96,7 +95,7 @@ export default class TelegramBot {
       clients: ctx.user.clients,
     };
     return this.serverService.processAudio(params)
-      .then(() => ctx.reply('Done'));
+      .catch(error => telegramErrorLogging(error, ctx));
   }
 
   /**
@@ -110,15 +109,16 @@ export default class TelegramBot {
     }
 
     if (validator.isUrl(text)) {
-      return this.serverService.processUrl({ url: text, userId: ctx.user.id }, ctx.user.volume, ctx.user.clients);
+      return this.serverService.processUrl({ url: text, userId: ctx.user.id }, ctx.user.volume, ctx.user.clients)
+        .catch(error => telegramErrorLogging(error, ctx));
     }
     const params = {
       text,
       voiceId: ctx.user.selectedVoiceId || config.defaultVoiceId,
       userId: ctx.user.id,
     };
-    return this.serverService.processText(params, ctx.user.volume, ctx.user.clients);
-    // .then(filePath => ctx.replyWithAudio({ source: filePath }));
+    return this.serverService.processText(params, ctx.user.volume, ctx.user.clients)
+      .catch(error => telegramErrorLogging(error, ctx));
   }
 
   /**
@@ -129,7 +129,25 @@ export default class TelegramBot {
     if (ctx.message.document.mime_type !== 'audio/mp3') {
       return ctx.reply('І що мені з цим робити?');
     }
-    return this.workWithAudio(ctx, ctx.message.document);
+    return this.workWithAudio(ctx, ctx.message.document)
+      .catch(error => telegramErrorLogging(error, ctx));
+  }
+
+  /**
+   * @param {object} ctx
+   * @return {Promise}
+   */
+  static sendChangeVoiceInstructions(ctx) {
+    return ctx.reply(`You havif (ctx.message.document.mime_type !== 'audio/mp3') {
+      return ctx.reply('І що мені з цим робити?');
+    }
+    return this.workWithAudio(ctx, ctx.message.document)
+      .then(() => ctx.reply('Done'))
+      .catch(error => ctx.reply(error.message));e 2 options to change voice:
+    - Press 'Language list' button, select language then select voice.
+    - Press 'Voice list' button and select voice.`, Extra.HTML().markup(m => m.inlineKeyboard([
+      Markup.callbackButton('Language list', '/l'), Markup.callbackButton('Voice list', '/v'),
+    ])));
   }
 
   /**
@@ -145,7 +163,7 @@ export default class TelegramBot {
       return this.sendLanguageList(ctx);
     }
     if (ctx.callbackQuery.data === '/c') {
-      return this.sendChangeVoiceInstructions(ctx);
+      return TelegramBot.sendChangeVoiceInstructions(ctx);
     }
     if (ctx.callbackQuery.data === '/v') {
       return this.sendVoiceList(ctx);
@@ -170,7 +188,8 @@ export default class TelegramBot {
       return ctx.reply(`${config.defaultVoiceId}(Male, Russian)`);
     }
     return this.userService.getUserVoice(ctx.user.id)
-      .then(voice => ctx.reply(`${voice.name}(${voice.gender}, ${voice.languageName})`));
+      .then(voice => ctx.reply(`${voice.name}(${voice.gender}, ${voice.languageName})`))
+      .catch(error => telegramErrorLogging(error, ctx));
   }
 
   /**
@@ -185,7 +204,7 @@ export default class TelegramBot {
         return TelegramBot.createInlineKeyboard(languageList.rows, 3, buttonNameFunction, buttonIdFunction);
       })
       .then(list => ctx.reply('Language list:', list))
-      .catch(error => logger.error(error));
+      .catch(error => telegramErrorLogging(error, ctx));
   }
 
   /**
@@ -201,7 +220,7 @@ export default class TelegramBot {
         return TelegramBot.createInlineKeyboard(voiceList.rows, languageId ? 3 : 2, buttonNameFunction, buttonIdFunction);
       })
       .then(list => ctx.reply('Voice list:', list))
-      .catch(error => logger.error(error));
+      .catch(error => telegramErrorLogging(error, ctx));
   }
 
   /**
@@ -212,7 +231,7 @@ export default class TelegramBot {
   changeUserVoice(ctx, voiceId) {
     return this.userService.updateUserVoiceId(ctx.user.id, voiceId)
       .then(() => ctx.reply('Voice changed'))
-      .catch(error => logger.error(error));
+      .catch(error => telegramErrorLogging(error, ctx));
   }
 
   /**
@@ -226,14 +245,13 @@ export default class TelegramBot {
     }
     return this.userService.updateUserVolume(ctx.user.id, volume)
       .then(() => ctx.reply('Volume changed'))
-      .catch(error => logger.error(error));
+      .catch(error => telegramErrorLogging(error, ctx));
   }
 
   /**
    * @return {Promise}
    */
   async start() {
-    this.bot.telegram.setWebhook(`${this.appUrl}${config.telegramPath}`);
     this.bot.use((ctx, next) => this.userMiddleware(ctx, next));
     this.bot.start(ctx => ctx.reply('Welcome! Write me some text. For more info use /help'));
     this.bot.help(ctx => ctx.reply(`command list:
@@ -254,11 +272,7 @@ export default class TelegramBot {
       [Markup.callbackButton('Selected voice', '/s'), Markup.callbackButton('Change voice', '/c')],
       [Markup.callbackButton('Language list', '/l'), Markup.callbackButton('Voice list', '/v')],
     ]))));
-    this.bot.command(['change', 'c'], ctx => ctx.reply(`You have 2 options to change voice:
-    - Press 'Language list' button, select language then select voice.
-    - Press 'Voice list' button and select voice.`, Extra.HTML().markup(m => m.inlineKeyboard([
-      Markup.callbackButton('Language list', '/l'), Markup.callbackButton('Voice list', '/v'),
-    ]))));
+    this.bot.command(['change', 'c'], ctx => TelegramBot.sendChangeVoiceInstructions(ctx));
     this.bot.command(['selected', 'sl'], ctx => this.sendSelectedVoice(ctx));
     this.bot.command(['language', 'l'], ctx => this.sendLanguageList(ctx));
     this.bot.command(['voice', 'v'], ctx => this.sendVoiceList(ctx));
@@ -270,11 +284,20 @@ export default class TelegramBot {
     this.bot.on('voice', ctx => this.workWithVoice(ctx));
     this.bot.on('document', ctx => this.workWithDocument(ctx));
     this.bot.on('message', ctx => ctx.reply('І що мені з цим робити?'));
-    this.bot.catch((err) => {
-      if (err) {
-        logger.error(err);
+    this.bot.catch((error) => {
+      if (!error) {
+        return;
       }
+      if (error.name === 'ValidationError') {
+        logger.info(error.message);
+      }
+      logger.error(error);
     });
-    this.bot.startWebhook(config.telegramPath, null, this.port);
+    this.bot.launch({
+      webhook: {
+        domain: `${this.appUrl}${config.telegramPath}`,
+        port: this.port,
+      },
+    });
   }
 }

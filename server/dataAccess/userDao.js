@@ -2,6 +2,7 @@ export default class UserDao {
   constructor(models) {
     this.users = models.users;
     this.voices = models.voices;
+    this.clients = models.clients;
   }
 
   addUser(user) {
@@ -45,9 +46,21 @@ export default class UserDao {
 
   getUserVoice(userId) {
     return this.users.findOne({
-      fields: [],
+      attributes: [],
       where: { id: userId },
       include: [{ model: this.voices, required: false }],
+    });
+  }
+
+  getUserClients(userId) {
+    return this.users.findOne({
+      attributes: [],
+      where: { id: userId },
+      include: [{
+        model: this.clients,
+        attributes: ['accessKey', 'name'],
+        required: true,
+      }],
     });
   }
 }

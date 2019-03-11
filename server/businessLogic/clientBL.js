@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { promisify } from 'util';
 import logger from '../helper/logger';
+import ValidationError from '../helper/validationError';
 import AudioService from './audioBL';
 
 export default class ClientService {
@@ -33,5 +34,24 @@ export default class ClientService {
     }
     client.send(JSON.stringify(data));
     return Promise.resolve();
+  }
+
+  /**
+   * @return {Promise}
+   * @param {{fileName: string, volume: number, song: Buffer|null, type: string|null, file: Buffer}} data
+   * @param {Array<{name: string, accessKey: string}>}clients
+   * @param webSocketClientList
+   */
+  static sendToClients(data, clients, webSocketClientList) {
+    if (!clients || !clients.length) {
+      return Promise.reject(new ValidationError('User don\'t have clients'));
+    }
+    return Promise.all(clients.map((client) => {
+      const wsc = webSocketClientList[client.accessKey];
+      if (!wsc) {
+        return Promise.reject(new ValidationError(`Client ${client.name} inactive, please try again later`));
+      }
+      return ClientService.sendToClient(data, wsc);
+    }));
   }
 }

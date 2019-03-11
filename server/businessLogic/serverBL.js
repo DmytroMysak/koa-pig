@@ -34,10 +34,7 @@ export default class serverService {
       await this.audioService.saveAudioToFileFromUrl(fileUrl, fileId, formatToMp3);
     }
 
-    return Promise.all(clients.map((clientId) => {
-      const client = this.webSocketClientList[clientId];
-      return ClientService.sendToClient({ fileName: fileId, volume }, client);
-    }));
+    return ClientService.sendToClients({ fileName: fileId, volume }, clients, this.webSocketClientList);
   }
 
   /**
@@ -61,10 +58,7 @@ export default class serverService {
       await this.messageService.linkSongToMessageByFileName(message.id, fileName);
     }
 
-    return Promise.all(clients.map((clientId) => {
-      const client = this.webSocketClientList[clientId];
-      return ClientService.sendToClient({ fileName, volume }, client);
-    }));
+    return ClientService.sendToClients({ fileName, volume }, clients, this.webSocketClientList);
   }
 
   /**
@@ -87,9 +81,6 @@ export default class serverService {
       await this.messageService.linkSongToMessageByFileName(message.id, fileName);
     }
 
-    return Promise.all(clients.map((clientId) => {
-      const client = this.webSocketClientList[clientId];
-      return ClientService.sendToClient({ fileName, volume }, client);
-    }));
+    return ClientService.sendToClients({ fileName, volume }, clients, this.webSocketClientList);
   }
 }

@@ -3,11 +3,11 @@ export default (sequelize, DataTypes) => {
     'users',
     {
       id: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         unique: true,
-        defaultValue: sequelize.literal('uuid_generate_v4()'),
+        autoIncrement: true,
       },
       facebookId: {
         type: DataTypes.STRING(50),
@@ -49,19 +49,17 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
-      role: {
-        type: DataTypes.ENUM('ADMIN', 'USER'),
-        allowNull: false,
-        defaultValue: 'USER',
-      },
     },
     {
       tableName: 'users',
-      timestamps: false,
+      timestamps: true,
+      createdat: 'createdAt',
     },
   );
   users.associate = (models) => {
     users.hasMany(models.messages, { foreignKey: 'userId' });
+    users.belongsToMany(models.clients, { through: 'usersClients', foreignKey: 'userId' });
+    users.belongsToMany(models.roles, { through: 'usersRoles', foreignKey: 'userId'});
     users.belongsTo(models.voices, { foreignKey: 'selectedVoiceId' });
   };
   return users;

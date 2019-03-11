@@ -6,7 +6,7 @@ import logger from './helper/logger';
 import sequelize from './models';
 import Tunnel from './businessLogic/httpsTunnel/tunnel';
 import TelegramBot from './businessLogic/bots/telegramBot';
-// import VoiceService from './businessLogic/voiceBL';
+import VoiceService from './businessLogic/voiceBL';
 import ServerService from './businessLogic/serverBL';
 import ClientService from './businessLogic/clientBL';
 
@@ -38,8 +38,10 @@ const main = async () => {
   const polly = new AWS.Polly({ signatureVersion: 'v4' });
   logger.info('AWS Polly ok');
 
-  // await new VoiceService().updateVoice(polly);
-  logger.info('Voices ok');
+  if (config.env === 'production') {
+    await new VoiceService().updateVoice(polly);
+    logger.info('Voices ok');
+  }
 
   const wss = new WebSocket.Server({
     port: config.wsPort,
