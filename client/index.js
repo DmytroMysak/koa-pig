@@ -38,7 +38,7 @@ ws.on('message', async (data) => {
     default:
       logger.error('Unexpected data from server');
       logger.error(data);
-      ws.send(JSON.stringify({ type: 'client_error' }));
+      return ws.send(JSON.stringify({ type: 'client_error' }));
   }
 });
 logger.info('Client started');
