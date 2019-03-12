@@ -17,7 +17,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING(50),
         allowNull: true,
       },
-      selectedVoiceId: {
+      voiceId: {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
@@ -49,6 +49,19 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
+      locale: {
+        type: DataTypes.STRING(2),
+        allowNull: true,
+        validate: {
+          len: {
+            args: [1, 2],
+            msg: 'locale should have from 1 to 2 symbols',
+          },
+          notEmpty: {
+            msg: 'locale name can\'t be empty',
+          },
+        },
+      },
     },
     {
       tableName: 'users',
@@ -59,8 +72,8 @@ export default (sequelize, DataTypes) => {
   users.associate = (models) => {
     users.hasMany(models.messages, { foreignKey: 'userId' });
     users.belongsToMany(models.clients, { through: 'usersClients', foreignKey: 'userId' });
-    users.belongsToMany(models.roles, { through: 'usersRoles', foreignKey: 'userId'});
-    users.belongsTo(models.voices, { foreignKey: 'selectedVoiceId' });
+    users.belongsToMany(models.roles, { through: 'usersRoles', foreignKey: 'userId' });
+    users.belongsTo(models.voices, { foreignKey: 'voiceId' });
   };
   return users;
 };

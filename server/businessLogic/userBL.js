@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import UserDao from '../dataAccess/userDao';
+import ClientDao from '../dataAccess/clientDao';
 import RoleDao from '../dataAccess/roleDao';
 import { models } from '../models/index';
 import config from '../config/env';
@@ -8,6 +9,7 @@ export default class UserService {
   constructor() {
     this.userDao = new UserDao(models);
     this.roleDao = new RoleDao(models);
+    this.clientDao = new ClientDao(models);
   }
 
   async upsertUserByTelegramId(user) {
@@ -26,8 +28,11 @@ export default class UserService {
   }
 
   getUserClients(userId) {
-    return this.userDao.getUserClients(userId)
-      .then(user => user && user.clients ? user.clients.map(elem => elem.get()) : []);
+    return Promise.all([this.clientDao.getUserClients(userId), this.clientDao.getPublicClients()])
+      .then(([user, publicClients]) => [
+        ...publicClients,
+        ...user && user.clients ? user.clients.map(elem => elem.get()) : [],
+      ]);
   }
 
   updateUserVoiceId(userId, voiceId) {

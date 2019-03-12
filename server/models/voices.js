@@ -33,7 +33,7 @@ export default (sequelize, DataTypes) => {
   voices.associate = (models) => {
     voices.hasMany(models.messages, { foreignKey: 'voiceId' });
     voices.hasMany(models.audio, { foreignKey: 'voiceId' });
-    voices.hasOne(models.users, { foreignKey: 'selectedVoiceId' });
+    voices.hasOne(models.users, { foreignKey: 'voiceId' });
   };
   return voices;
 };

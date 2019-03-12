@@ -17,15 +17,20 @@ const paths = {
     '!dist/**',
     '!node_modules/**',
   ],
-  nonJs: ['./package.json'],
+  locales: ['locales/**'],
+  package: ['./package.json'],
 };
 
 // Clean up dist and coverage directory
 gulp.task('clean', () => del(['dist/**', '!dist']));
 
-gulp.task('copy', () => gulp.src(paths.nonJs)
-  .pipe(changed('dist'))
+gulp.task('locales', () => gulp.src(paths.locales)
+  .pipe(gulp.dest('dist/locales')));
+
+gulp.task('package', () => gulp.src(paths.package)
   .pipe(gulp.dest('dist')));
+
+gulp.task('copy', gulp.parallel('locales', 'package'));
 
 // Compile ES6 to ES5 and copy to dist
 gulp.task('babel', () => gulp.src(paths.js, { base: '.' })

@@ -27,6 +27,7 @@ const defaults = {
   telegramPath: '/bot/telegram/webhook',
   defaultVoiceId: 'Maxim',
   superAdminIds: ['352045593'],
+  defaultLocale: 'en',
 };
 
 export default Object.assign(defaults, config.default);

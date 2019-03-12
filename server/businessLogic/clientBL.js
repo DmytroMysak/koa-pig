@@ -42,14 +42,18 @@ export default class ClientService {
    * @param {Array<{name: string, accessKey: string}>}clients
    * @param webSocketClientList
    */
-  static sendToClients(data, clients, webSocketClientList) {
+  static async sendToClients(data, clients, webSocketClientList) {
     if (!clients || !clients.length) {
-      return Promise.reject(new ValidationError('User don\'t have clients'));
+      return Promise.reject(new ValidationError('user_do_not_have_clients'));
     }
     return Promise.all(clients.map((client) => {
       const wsc = webSocketClientList[client.accessKey];
       if (!wsc) {
-        return Promise.reject(new ValidationError(`Client ${client.name} inactive, please try again later`));
+        return Promise.reject(new ValidationError([
+          { text: 'client', translate: true },
+          { text: client.name, translate: false },
+          { text: 'inactive, please try again later', translate: true },
+        ]));
       }
       return ClientService.sendToClient(data, wsc);
     }));

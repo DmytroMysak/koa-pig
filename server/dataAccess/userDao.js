@@ -18,15 +18,16 @@ export default class UserDao {
 
   getUserByTelegramId(telegramId) {
     return this.users.findOne({
+      attributes: ['volume', 'id', 'voiceId', 'locale'],
       where: { telegramId },
     });
   }
 
   updateUserVoiceId(userId, voiceId) {
     return this.users.update(
-      { selectedVoiceId: voiceId },
+      { voiceId },
       {
-        fields: ['selectedVoiceId'],
+        fields: ['voiceId'],
         where: { id: userId },
         returning: true,
       },
@@ -49,18 +50,6 @@ export default class UserDao {
       attributes: [],
       where: { id: userId },
       include: [{ model: this.voices, required: false }],
-    });
-  }
-
-  getUserClients(userId) {
-    return this.users.findOne({
-      attributes: [],
-      where: { id: userId },
-      include: [{
-        model: this.clients,
-        attributes: ['accessKey', 'name'],
-        required: true,
-      }],
     });
   }
 }

@@ -3,7 +3,7 @@ import WebSocket from 'ws';
 import AWS from 'aws-sdk';
 import config from './config/env';
 import logger from './helper/logger';
-import sequelize from './models';
+import sequelize, { models } from './models';
 import Tunnel from './businessLogic/httpsTunnel/tunnel';
 import TelegramBot from './businessLogic/bots/telegramBot';
 import VoiceService from './businessLogic/voiceBL';
@@ -34,6 +34,8 @@ const main = async () => {
 
   await sequelize.authenticate();
   logger.info('DataBase ok');
+  // temp client for test
+  // await models.clients.create({ name: 'test', type: 'public', accessKey: 'xxx' });
 
   const polly = new AWS.Polly({ signatureVersion: 'v4' });
   logger.info('AWS Polly ok');
