@@ -8,12 +8,7 @@ const del = require('del');
 
 const paths = {
   js: [
-    'config/**/*.js',
-    'businessLogic/**/*.js',
-    'dataAccess/**/*.js',
-    'models/**/*.js',
-    'helper/*.js',
-    './index.js',
+    'src/**/*.js',
     '!dist/**',
     '!node_modules/**',
   ],
@@ -52,7 +47,7 @@ gulp.task('babel', () => gulp.src(paths.js, { base: '.' })
 
 gulp.task('build', gulp.series('clean', gulp.parallel('copy', 'babel')));
 
-gulp.task('nodemon', done => nodemon({
+gulp.task('nodemon', (done) => nodemon({
   script: path.join('dist', 'index.js'),
   ext: 'js',
   ignore: ['dist', '**/*___jb_tmp___'],
