@@ -1,35 +1,29 @@
-import config from '../config/env';
-import logger from './helper/logger';
-import AwsService from './services/awsService';
-import Tunnel from './services/httpsTunnel/serveo';
-import TelegramBot from './services/bots/telegramBot';
+const config = require('./config/env');
+const logger = require('./helper/logger');
+const Tunnel = require('./services/httpsTunnel/ngrok');
+const TelegramBot = require('./services/bots/telegramBot');
+const voiceService = require('./services/voiceService');
+const I18nService = require('./services/i18nService');
+const { dbInitialize } = require('./models/index');
 
 const createAppUrl = async () => {
   const tunnel = new Tunnel(config.port);
   await tunnel.start();
-  logger.debug('Tunnel ok');
+
   const appUrl = tunnel.getUrlAddress();
   logger.debug(`App url: ${appUrl}`);
-};
 
-const initializeAws = async () => {
-  const awsService = new AwsService();
-  await awsService.startAwsPolly();
-
-  if (config.env === 'production') {
-    await awsService.updateVoice();
-  }
+  return appUrl;
 };
 
 const main = async () => {
-  await initializeAws();
+  await dbInitialize();
+  await voiceService.initialize();
+  await new I18nService().initialize();
 
-  let appUrl;
-  if (config.createAppUrl) {
-    appUrl = await createAppUrl();
-  }
+  const appUrl = config.createAppUrl ? (await createAppUrl()) : config.appUrl;
+  const telegramBot = new TelegramBot(appUrl, config.port);
 
-  const telegramBot = new TelegramBot(appUrl || config.appUrl, config.telegramPort);
   await telegramBot.start();
   logger.debug('Telegram bot started');
 };

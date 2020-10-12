@@ -1,6 +1,6 @@
-import BaseCommand from './baseCommand';
+const BaseCommand = require('./baseCommand');
 
-export default class StartCommand extends BaseCommand {
+module.exports = class StartCommand extends BaseCommand {
   constructor() {
     super();
     this.name = null;
@@ -8,7 +8,6 @@ export default class StartCommand extends BaseCommand {
   }
 
   async execute(ctx) {
-    const text = this.i18n.translate('hello_message', ctx.user.locale);
-    return ctx.reply(text);
+    return this.sendResponseAndTranslate('hello_message', ctx);
   }
-}
+};

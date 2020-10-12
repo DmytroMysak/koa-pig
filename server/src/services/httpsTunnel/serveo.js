@@ -1,7 +1,7 @@
-import { spawn } from 'child_process';
-import logger from '../../helper/logger';
+const { spawn } = require('child_process');
+const logger = require('../../helper/logger');
 
-export default class Serveo {
+module.exports = class Serveo {
   constructor(port) {
     this.port = port;
     this.process = null;
@@ -27,4 +27,4 @@ export default class Serveo {
   getUrlAddress() {
     return this.stdoutData.match(/https:\/\/[\w]+.serveo.net/g)[0];
   }
-}
+};

@@ -1,10 +1,9 @@
 /* eslint-disable import/first */
-
 require('dotenv').config();
 
-import path from 'path';
-import development from './development';
-import production from './production';
+const path = require('path');
+const development = require('./development');
+const production = require('./production');
 
 const env = process.env.NODE_ENV || 'development';
 const config = { development, production };
@@ -14,6 +13,10 @@ const defaults = {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     region: process.env.AWS_REGION || 'eu-west-1',
+  },
+  bucket: {
+    name: 'pig-bot-songs',
+    url: 'https://storage.googleapis.com',
   },
   songFormat: 'mp3',
   fbVerifyToken: process.env.FB_VERITY_TOKEN,
@@ -25,7 +28,7 @@ const defaults = {
   defaultVoiceId: 'Maxim',
   superAdminIds: ['352045593'],
   defaultLocale: 'en',
-  localesPath: path.normalize(`${__dirname}/../../locales`),
+  localesPath: path.normalize(`${__dirname}/../../../locales`),
 };
 
-export default { ...defaults, ...(config[env] || config.development) };
+module.exports = { ...defaults, ...(config[env] || config.development) };

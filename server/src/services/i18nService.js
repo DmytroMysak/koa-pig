@@ -1,14 +1,19 @@
-import fs from 'fs';
-import path from 'path';
-import { promisify } from 'util';
-import config from '../../config/env';
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
+const config = require('../config/env');
 
 const readDir = promisify(fs.readdir);
 const readFile = promisify(fs.readFile);
 
-export default class I18nService {
+module.exports = class I18nService {
   constructor() {
+    if (typeof I18nService.instance === 'object') {
+      return I18nService.instance;
+    }
+    I18nService.instance = this;
     this.locales = new Map();
+    return this;
   }
 
   async initialize() {
@@ -27,7 +32,7 @@ export default class I18nService {
     }
   }
 
-  translate(label, currentLocale) {
+  translate(label, currentLocale = config.defaultLocale) {
     return this.locales.get(currentLocale)[label] || label;
   }
-}
+};

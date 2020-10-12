@@ -1,10 +1,11 @@
-import { Extra, Markup } from 'telegraf';
-import config from '../../../config/env';
-import I18nService from '../i18nService';
+const { Extra, Markup } = require('telegraf');
+const I18nService = require('../i18nService');
 
-export default class BaseCommand {
+module.exports = class BaseCommand {
   constructor() {
     this.i18n = new I18nService();
+    this.languageChangePrefix = 'languageChange_';
+    this.voiceChangePrefix = 'voiceChange_';
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -15,25 +16,18 @@ export default class BaseCommand {
     ));
   }
 
-  /**
-   * Template for creating inline keyboard
-   * @return {Promise}
-   * @param {string|Array<{text: string, translate: boolean}>} input
-   * @param {object} ctx
-   */
-  async sendResponseAndTranslate(input, ctx) {
+  sendResponseAndTranslate(input, ctx) {
     let text;
     if (Array.isArray(input)) {
-      text = input.map(async (elem) => {
+      text = input.map((elem) => {
         if (elem.translate) {
-          const translatedText = await this.localization.translate(elem.text, ctx.user.locale || config.defaultLocale);
-          return translatedText;
+          return this.i18n.translate(elem.text, ctx.user.locale);
         }
         return elem.text;
       });
     } else {
-      text = await this.localization.translate(input, ctx.user.locale || config.defaultLocale);
+      text = this.i18n.translate(input, ctx.user.locale);
     }
     return ctx.reply(text);
   }
-}
+};

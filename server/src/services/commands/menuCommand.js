@@ -1,7 +1,7 @@
-import { Extra, Markup } from 'telegraf';
-import BaseCommand from './baseCommand';
+const { Extra, Markup } = require('telegraf');
+const BaseCommand = require('./baseCommand');
 
-export default class MenuCommand extends BaseCommand {
+module.exports = class MenuCommand extends BaseCommand {
   constructor() {
     super();
     this.name = ['menu', 'm'];
@@ -15,8 +15,8 @@ export default class MenuCommand extends BaseCommand {
     const voiceListText = this.i18n.translate('voice_list', ctx.user.locale);
 
     return ctx.reply('menu', Extra.HTML().markup((m) => m.inlineKeyboard([
-      [Markup.callbackButton(selectedVoiceText, '/s'), Markup.callbackButton(changeVoiceText, '/c')],
-      [Markup.callbackButton(languageListText, '/l'), Markup.callbackButton(voiceListText, '/v')],
+      [Markup.callbackButton(selectedVoiceText, '/selected'), Markup.callbackButton(changeVoiceText, '/c')],
+      [Markup.callbackButton(languageListText, '/languages'), Markup.callbackButton(voiceListText, '/v')],
     ])));
   }
-}
+};

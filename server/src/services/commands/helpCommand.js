@@ -1,6 +1,6 @@
-import BaseCommand from './baseCommand';
+const BaseCommand = require('./baseCommand');
 
-export default class HelpCommand extends BaseCommand {
+module.exports = class HelpCommand extends BaseCommand {
   constructor() {
     super();
     this.name = null;
@@ -19,4 +19,4 @@ export default class HelpCommand extends BaseCommand {
     return ctx.reply(`${commandListText}\n  ${callMenuText}\n  ${returnCurrentVoiceText}\n  ${changeVoiceHelpText}
   ${returnLanguageListText}\n  ${returnVoiceListText}\n  ${stopCurrentAudioText}\n  ${changeVolumeHelpText}`);
   }
-}
+};

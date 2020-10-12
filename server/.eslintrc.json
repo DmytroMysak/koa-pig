@@ -1,20 +1,20 @@
 {
-  "parser": "babel-eslint",
-  "extends": [
-    "airbnb-base",
-    "plugin:you-dont-need-lodash-underscore/compatible"
-  ],
-  "rules": {
-    "max-len": ["error", { "code": 130 }],
-    "no-else-return": ["error", { "allowElseIf": true }],
-    "object-curly-newline": ["error", {
-      "minProperties": 6,
-      "consistent": true
-    }],
-    "you-dont-need-lodash-underscore/omit": "off"
-  },
-  "env": {
-    "node": true,
-    "es6": true
-  }
+    "env": {
+        "commonjs": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "airbnb-base"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2020
+    },
+    "rules": {
+        "max-len": ["error", { "code": 130 }],
+        "object-curly-newline": ["error", {
+            "minProperties": 6,
+            "consistent": true
+        }]
+    }
 }

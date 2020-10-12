@@ -1,28 +1,22 @@
-import AWS from 'aws-sdk';
-import config from '../../config/env';
-import logger from '../helper/logger';
-import Voice from '../models/voices';
+const AWS = require('aws-sdk');
+const config = require('../config/env');
+const logger = require('../helper/logger');
+const Voice = require('../models/voices');
 
-export default class AwsService {
-  constructor() {
-    this.polly = null;
-  }
+AWS.config = new AWS.Config({
+  accessKeyId: config.aws.accessKeyId,
+  secretAccessKey: config.aws.secretAccessKey,
+  region: config.aws.region,
+});
 
-  async startAwsPolly() {
-    AWS.config = new AWS.Config({
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
-      region: config.aws.region,
-    });
-    this.polly = new AWS.Polly({ signatureVersion: 'v4' });
-    logger.debug('AWS Polly ok');
-  }
+const polly = new AWS.Polly({ signatureVersion: 'v4' });
 
-  async updateVoice() {
-    if (!this.polly) {
+module.exports = {
+  updateVoice: async () => {
+    if (!polly) {
       throw Error('No polly initialized');
     }
-    const data = await this.polly.describeVoices().promise();
+    const data = await polly.describeVoices().promise();
 
     const voices = data.Voices.map((voice) => ({
       id: voice.Id,
@@ -38,5 +32,9 @@ export default class AwsService {
       logger.info('Voices already added to DB', error);
     }
     logger.debug('Voice initialized');
-  }
-}
+  },
+
+  createAudioFileFromText: async (text, voiceId) => (
+    polly.synthesizeSpeech({ OutputFormat: 'mp3', Text: text, VoiceId: voiceId }).promise()
+  ),
+};

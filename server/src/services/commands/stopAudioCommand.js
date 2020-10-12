@@ -1,13 +1,15 @@
-import BaseCommand from './baseCommand';
+const BaseCommand = require('./baseCommand');
+const ClientService = require('../clientService');
 
-export default class StopAudioCommand extends BaseCommand {
+module.exports = class StopAudioCommand extends BaseCommand {
   constructor() {
     super();
     this.name = ['stop', 's'];
     this.type = 'command';
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async execute(ctx) {
-    return this.audio.stopSong();
+    return ClientService.sendToClients({ command: 'stop-song' }, ctx.user.selectedClients);
   }
-}
+};

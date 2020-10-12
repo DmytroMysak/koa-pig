@@ -1,6 +1,7 @@
-import BaseCommand from './baseCommand';
+const BaseCommand = require('./baseCommand');
+const voiceService = require('../voiceService');
 
-export default class LanguagesCommand extends BaseCommand {
+module.exports = class LanguagesCommand extends BaseCommand {
   constructor() {
     super();
     this.name = ['language', 'l'];
@@ -8,11 +9,12 @@ export default class LanguagesCommand extends BaseCommand {
   }
 
   async execute(ctx) {
-    const languageList = await this.voiceService.getLanguagesList(true);
+    const languageList = voiceService.getLanguagesList();
     const buttonNameFunction = (elem) => elem.name;
     const buttonIdFunction = (elem) => `${this.languageChangePrefix}${elem.code}`;
-    const list = await this.createInlineKeyboard(languageList.rows, 3, buttonNameFunction, buttonIdFunction);
-    await this.sendResponseAndTranslate('language_list:', ctx);
+    const list = await this.createInlineKeyboard(languageList, 3, buttonNameFunction, buttonIdFunction);
+
+    this.sendResponseAndTranslate('language_list:', ctx);
     return ctx.reply(list);
   }
-}
+};

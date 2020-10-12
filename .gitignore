@@ -5,6 +5,7 @@ logs/**
 songs/**
 server/songs/**
 client/songs/**
+server/service-account.json
 
 # User-specific stuff
 .idea/*

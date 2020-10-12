@@ -1,7 +1,7 @@
-import { Markup, Extra } from 'telegraf';
-import BaseCommand from './baseCommand';
+const { Markup, Extra } = require('telegraf');
+const BaseCommand = require('./baseCommand');
 
-export default class ChangeVoiceCommand extends BaseCommand {
+module.exports = class ChangeVoiceCommand extends BaseCommand {
   constructor() {
     super();
     this.name = ['change', 'c'];
@@ -9,12 +9,14 @@ export default class ChangeVoiceCommand extends BaseCommand {
   }
 
   async execute(ctx) {
-    const languageListText = await this.i18n.translate('language_list', ctx.user.locale);
-    const voiceListText = await this.i18n.translate('voice_list', ctx.user.locale);
-    await this.sendResponseAndTranslate('change_voice_instructions', ctx);
+    const languageListText = this.i18n.translate('language_list', ctx.user.locale);
+    const voiceListText = this.i18n.translate('voice_list', ctx.user.locale);
+
+    this.sendResponseAndTranslate('change_voice_instructions', ctx);
+
     return ctx.reply(Extra.HTML().markup((m) => m.inlineKeyboard([
       Markup.callbackButton(languageListText, '/l'),
       Markup.callbackButton(voiceListText, '/v'),
     ])));
   }
-}
+};

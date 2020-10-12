@@ -1,6 +1,6 @@
-import mongoose, { Schema } from 'mongoose';
+const mongoose = require('mongoose');
 
-const settingSchema = new Schema({
+const settingSchema = new mongoose.Schema({
   volume: {
     type: Number,
     default: 100,
@@ -19,7 +19,7 @@ const settingSchema = new Schema({
   },
 });
 
-const clientSchema = new Schema({
+const clientSchema = new mongoose.Schema({
   accessKey: {
     type: String,
     max: 100,
@@ -34,10 +34,11 @@ const clientSchema = new Schema({
   },
 });
 
-const userSchema = new Schema({
+const userSchema = new mongoose.Schema({
   telegramId: {
     type: String,
     unique: true,
+    required: true,
   },
   firstName: {
     type: String,
@@ -48,9 +49,18 @@ const userSchema = new Schema({
   username: {
     type: String,
   },
-  settings: settingSchema,
+  settings: {
+    type: settingSchema,
+    required: true,
+    default: () => ({
+      volume: 100,
+      locale: 'ua',
+      voiceId: 'Maxim',
+    }),
+  },
   role: {
     type: String,
+    required: true,
     enum: ['admin', 'user'],
     default: 'user',
   },
@@ -62,5 +72,5 @@ const userSchema = new Schema({
 
 userSchema.index({ telegramId: 1 });
 
-const User = mongoose.model('User', userSchema);
-export default User;
+const User = mongoose.model('users', userSchema);
+module.exports = User;

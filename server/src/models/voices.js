@@ -1,6 +1,6 @@
-import mongoose, { Schema } from 'mongoose';
+const mongoose = require('mongoose');
 
-const voiceSchema = new Schema({
+const voiceSchema = new mongoose.Schema({
   id: {
     type: String,
     unique: true,
@@ -19,10 +19,7 @@ const voiceSchema = new Schema({
   },
 }, {
   _id: false,
-  id: false,
 });
 
-// userSchema.index({ telegramId: 1 });
-
-const Voice = mongoose.model('Voice', voiceSchema);
-export default Voice;
+const Voice = mongoose.model('voices', voiceSchema);
+module.exports = Voice;
