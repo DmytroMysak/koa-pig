@@ -28,13 +28,15 @@
   "dependencies": {
     "better-npm-run": "^0.1.0",
     "dotenv": "^6.0.0",
+    "fluent-ffmpeg": "^2.1.2",
     "lodash": "^4.17.10",
     "moment": "^2.22.1",
     "p-queue": "^3.0.0",
     "pino": "^5.10.6",
     "play-sound": "^1.1.2",
     "pm2": "^3.0.4",
-    "ws": "^6.1.2"
+    "ws": "^6.1.2",
+    "ytdl-core": "^3.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.3.4",
