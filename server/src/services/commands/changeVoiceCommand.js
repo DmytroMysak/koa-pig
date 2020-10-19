@@ -1,22 +1,26 @@
-const { Markup, Extra } = require('telegraf');
+const { Markup } = require('telegraf');
 const BaseCommand = require('./baseCommand');
+const voiceService = require('../voiceService');
 
 module.exports = class ChangeVoiceCommand extends BaseCommand {
   constructor() {
     super();
-    this.name = ['change', 'c'];
+    this.name = ['change', 'ch'];
     this.type = 'command';
+    this.hears = this.i18n.translateAll('change_voice');
   }
 
-  async execute(ctx) {
-    const languageListText = this.i18n.translate('language_list', ctx.user.locale);
-    const voiceListText = this.i18n.translate('voice_list', ctx.user.locale);
+  execute(ctx, languageId = null) {
+    const voiceList = voiceService.getVoicesList(languageId);
+    const buttonNameFunction = (elem) => `${elem.name}(${elem.gender}, ${elem.languageCode})`;
+    const buttonIdFunction = (elem) => `${this.voiceChangePrefix}${elem.id}`;
 
-    this.sendResponseAndTranslate('change_voice_instructions', ctx);
-
-    return ctx.reply(Extra.HTML().markup((m) => m.inlineKeyboard([
-      Markup.callbackButton(languageListText, '/l'),
-      Markup.callbackButton(voiceListText, '/v'),
-    ])));
+    return ctx.reply(
+      this.i18n.translate('voice_list'),
+      Markup.inlineKeyboard(
+        voiceList.map((voice) => Markup.callbackButton(buttonNameFunction(voice), buttonIdFunction(voice))),
+        { columns: 2 },
+      ).extra(),
+    );
   }
 };

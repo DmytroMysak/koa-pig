@@ -1,16 +1,14 @@
 {
   "sorry_only_youtube": "Sorry, I can support only youtube for now.",
   "no_idea_what_to_do": "I have no idea what to do with that.",
-  "language_list:": "Language list:",
-  "language_list": "Language list",
   "voice_list": "Voice list:",
   "voice_changed": "Voice changed.",
   "bad_volume_value": "Bad volume value.",
   "volume_changed": "Volume changed.",
   "change_voice_instructions": "You have 2 options to change voice:\n - Press 'Language list' button, select language then select voice.\n - Press 'Voice list' button and select voice.",
-  "hello_message": "Welcome! Write me some text. For more info use /help",
-  "selected_voice": "Selected voice",
-  "change_voice": "Change voice",
+  "hello_message": "Welcome! Write me some text. \nFor more info use /help",
+  "selected_voice": "My voice \uD83D\uDD0A",
+  "change_voice": "Change voice \uD83C\uDFA4",
   "command_list:": "Command list:",
   "call_menu": "/menu or /m -> call menu",
   "return_current_voice": "/selected or /sl -> return current voice",
@@ -22,5 +20,11 @@
   "user_do_not_have_clients": "You don't have clients, select client use /clients",
   "client": "Client",
   "inactive, please try again later": "inactive, please try again later.",
-  "menu": "Menu"
+  "menu": "Menu",
+  "localization": "Languages",
+  "localization_changed": "Language changed",
+  "language": "Language \uD83C\uDFF3️\u200D\uD83C\uDF08",
+  "en": "English \uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67\uDB40\uDC7F",
+  "ua": "Ukraine \uD83C\uDDFA\uD83C\uDDE6",
+  "manage_clients": "Manage \uD83D\uDC37"
 }

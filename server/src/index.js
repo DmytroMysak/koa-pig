@@ -3,7 +3,7 @@ const logger = require('./helper/logger');
 const Tunnel = require('./services/httpsTunnel/ngrok');
 const TelegramBot = require('./services/bots/telegramBot');
 const voiceService = require('./services/voiceService');
-const I18nService = require('./services/i18nService');
+const i18nService = require('./services/i18nService');
 const { dbInitialize } = require('./models/index');
 
 const createAppUrl = async () => {
@@ -18,8 +18,10 @@ const createAppUrl = async () => {
 
 const main = async () => {
   await dbInitialize();
-  await voiceService.initialize();
-  await new I18nService().initialize();
+  await Promise.all([
+    voiceService.initialize(),
+    i18nService.initialize(),
+  ]);
 
   const appUrl = config.createAppUrl ? (await createAppUrl()) : config.appUrl;
   const telegramBot = new TelegramBot(appUrl, config.port);

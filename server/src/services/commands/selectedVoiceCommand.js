@@ -7,6 +7,7 @@ module.exports = class SelectedVoiceCommand extends BaseCommand {
     super();
     this.name = ['selected', 'sl'];
     this.type = 'command';
+    this.hears = this.i18n.translateAll('selected_voice');
   }
 
   async execute(ctx) {

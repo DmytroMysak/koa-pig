@@ -1,8 +1,9 @@
-## <small>0.7.1 (2020-10-16)</small>
+## <small>0.7.2 (2020-10-16)</small>
 
+* docs(changelog): generate init changelog ([2cddf3d](https://github.com/DmytroMysak/koa-pig/commit/2cddf3d))
+* docs(package.json): use commitizen for changelog ([9341010](https://github.com/DmytroMysak/koa-pig/commit/9341010))
 * chore(version): update version ([103b4f7](https://github.com/DmytroMysak/koa-pig/commit/103b4f7))
 * refactor(changelog): delete unsed libraries. Formated file name ([6f1b117](https://github.com/DmytroMysak/koa-pig/commit/6f1b117))
-* docs(package.json): use commitizen for changelog ([9341010](https://github.com/DmytroMysak/koa-pig/commit/9341010))
 * add all functionality from mock command ([2529a65](https://github.com/DmytroMysak/koa-pig/commit/2529a65))
 * add correct permission to sh script ([e43f795](https://github.com/DmytroMysak/koa-pig/commit/e43f795))
 * add ervice for startup ([7dd7bb1](https://github.com/DmytroMysak/koa-pig/commit/7dd7bb1))

@@ -18,6 +18,7 @@ const defaults = {
     name: 'pig-bot-songs',
     url: 'https://storage.googleapis.com',
   },
+  amqpUrl: process.env.AMQP_URL,
   songFormat: 'mp3',
   fbVerifyToken: process.env.FB_VERITY_TOKEN,
   fbAccessToken: process.env.FB_ACCESS_TOKEN,

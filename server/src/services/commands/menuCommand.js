@@ -1,4 +1,4 @@
-const { Extra, Markup } = require('telegraf');
+const { Markup } = require('telegraf');
 const BaseCommand = require('./baseCommand');
 
 module.exports = class MenuCommand extends BaseCommand {
@@ -9,14 +9,25 @@ module.exports = class MenuCommand extends BaseCommand {
   }
 
   async execute(ctx) {
-    const selectedVoiceText = this.i18n.translate('selected_voice', ctx.user.locale);
-    const changeVoiceText = this.i18n.translate('change_voice', ctx.user.locale);
-    const languageListText = this.i18n.translate('language_list', ctx.user.locale);
-    const voiceListText = this.i18n.translate('voice_list', ctx.user.locale);
+    const selectedVoiceText = this.i18n.translate('selected_voice', ctx.user.settings.locale);
+    const changeVoiceText = this.i18n.translate('change_voice', ctx.user.settings.locale);
+    const changeLanguageText = this.i18n.translate('language', ctx.user.settings.locale);
+    const manageClientsText = this.i18n.translate('manage_clients', ctx.user.settings.locale);
 
-    return ctx.reply('menu', Extra.HTML().markup((m) => m.inlineKeyboard([
-      [Markup.callbackButton(selectedVoiceText, '/selected'), Markup.callbackButton(changeVoiceText, '/c')],
-      [Markup.callbackButton(languageListText, '/languages'), Markup.callbackButton(voiceListText, '/v')],
-    ])));
+    // await ctx.reply('remove keyboard', Markup.removeKeyboard());
+
+    return ctx.reply(
+      this.i18n.translate('menu', ctx.user.settings.locale),
+      Markup.keyboard([
+        [
+          Markup.button(selectedVoiceText),
+          Markup.button(changeVoiceText),
+        ],
+        [
+          Markup.button(changeLanguageText),
+          Markup.button(manageClientsText),
+        ],
+      ]).resize().extra(),
+    );
   }
 };

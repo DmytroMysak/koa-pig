@@ -1,19 +1,10 @@
-const { Extra, Markup } = require('telegraf');
-const I18nService = require('../i18nService');
+const i18nService = require('../i18nService');
 
 module.exports = class BaseCommand {
   constructor() {
-    this.i18n = new I18nService();
-    this.languageChangePrefix = 'languageChange_';
+    this.i18n = i18nService;
     this.voiceChangePrefix = 'voiceChange_';
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  createInlineKeyboard(list, chuckSize, buttonNameFunction, buttonIdFunction) {
-    const chuckedArray = new Array(Math.ceil(list.length / chuckSize)).fill().map(() => list.splice(0, chuckSize));
-    return Extra.HTML().markup((m) => m.inlineKeyboard(
-      chuckedArray.map((array) => array.map((elem) => Markup.callbackButton(buttonNameFunction(elem), buttonIdFunction(elem)))),
-    ));
+    this.localeChangePrefix = 'localeChange_';
   }
 
   sendResponseAndTranslate(input, ctx) {
@@ -21,12 +12,15 @@ module.exports = class BaseCommand {
     if (Array.isArray(input)) {
       text = input.map((elem) => {
         if (elem.translate) {
-          return this.i18n.translate(elem.text, ctx.user.locale);
+          return this.i18n.translate(elem.text, ctx.user.settings.locale);
         }
         return elem.text;
       });
     } else {
-      text = this.i18n.translate(input, ctx.user.locale);
+      text = this.i18n.translate(input, ctx.user.settings.locale);
+    }
+    if (ctx.updateType === 'callback_query') {
+      return ctx.answerCbQuery(text);
     }
     return ctx.reply(text);
   }

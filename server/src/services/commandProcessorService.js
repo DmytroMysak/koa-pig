@@ -17,9 +17,10 @@ module.exports = class CommandProcessorService {
       'menuCommand',
       'changeVoiceCommand',
       'selectedVoiceCommand',
-      'languagesCommand',
-      'voiceListCommand',
+      'changeLocaleCommand',
+
       'stopAudioCommand',
+      'userVolumeCommand',
       // ...
       'callbackCommand',
       'textCommand',
@@ -46,7 +47,15 @@ module.exports = class CommandProcessorService {
       .map((file) => require(`${__dirname}/commands/${file.base}`));
 
     commands.forEach((Command) => {
-      this.addCommand(new Command());
+      const command = new Command();
+      this.addCommand(command);
+
+      if (command.hears) {
+        const hearsCommand = new Command();
+        hearsCommand.type = 'hears';
+        hearsCommand.name = hearsCommand.hears;
+        this.addCommand(hearsCommand);
+      }
     });
   }
 };
