@@ -1,5 +1,6 @@
-module.exports ={
+module.exports = {
   env: 'production',
+  isProd: true,
   port: process.env.PORT || 8080,
   logger: {
     prettyPrint: false,

@@ -7,19 +7,28 @@ let voices = [];
 
 module.exports = {
   initialize: async () => {
-    if (config.env === 'production') {
+    if (config.isProd) {
       await awsService.updateVoice();
     }
     voices = await Voices.find().lean();
+    voices = voices.map((el) => {
+      const code = el.languageCode.split('-');
+
+      return ({ ...el, code: ['US', 'GB'].includes(code[1]) ? 'en' : code[0] });
+    });
   },
 
   getById: (id) => voices.find((el) => el.id === id),
 
-  getLanguagesList: () => uniqBy(voices, 'languageCode').map((el) => ({ name: el.languageName, code: el.languageCode })),
+  getLanguagesList: () => uniqBy(voices, 'code').map((el) => ({
+    name: el.languageName,
+    languageCode: el.languageCode,
+    code: el.code,
+  })),
 
-  getVoicesList: (languageCode = null) => {
-    if (languageCode) {
-      return voices.filter((el) => el.languageCode === languageCode);
+  getVoicesList: (code = null) => {
+    if (code) {
+      return voices.filter((el) => el.code === code);
     }
     return voices;
   },

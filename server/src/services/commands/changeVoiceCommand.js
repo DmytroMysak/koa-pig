@@ -10,17 +10,13 @@ module.exports = class ChangeVoiceCommand extends BaseCommand {
     this.hears = this.i18n.translateAll('change_voice');
   }
 
-  execute(ctx, languageId = null) {
-    const voiceList = voiceService.getVoicesList(languageId);
-    const buttonNameFunction = (elem) => `${elem.name}(${elem.gender}, ${elem.languageCode})`;
-    const buttonIdFunction = (elem) => `${this.voiceChangePrefix}${elem.id}`;
+  execute(ctx) {
+    const languageListButton = voiceService.getLanguagesList()
+      .map((el) => Markup.callbackButton(el.name, `${this.languageChangePrefix}${el.code}`));
 
     return ctx.reply(
       this.i18n.translate('voice_list'),
-      Markup.inlineKeyboard(
-        voiceList.map((voice) => Markup.callbackButton(buttonNameFunction(voice), buttonIdFunction(voice))),
-        { columns: 2 },
-      ).extra(),
+      Markup.inlineKeyboard(languageListButton, { columns: 2 }).extra(),
     );
   }
 };

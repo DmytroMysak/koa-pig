@@ -4,6 +4,7 @@ module.exports = class BaseCommand {
   constructor() {
     this.i18n = i18nService;
     this.voiceChangePrefix = 'voiceChange_';
+    this.languageChangePrefix = 'languageChange_';
     this.localeChangePrefix = 'localeChange_';
   }
 
