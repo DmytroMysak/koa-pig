@@ -1,14 +1,26 @@
 require('dotenv').config();
 
+const path = require('path');
+const development = require('./development');
+const production = require('./production');
+
 const env = process.env.NODE_ENV || 'development';
-const config = require(`./${env}`); // eslint-disable-line import/no-dynamic-require
+const config = { development, production };
 
 const defaults = {
-  folderToSaveSongs: 'songs',
-  folderToSaveLogs: 'logs',
-  songFormat: 'mp3',
-  secretKey: 'xxx' || process.env.APP_URL,
+  songsDirectory: path.normalize(`${__dirname}/../../songs`),
+  logsDirectory: path.normalize(`${__dirname}/../../logs`),
+  logger: {
+    level: 'debug',
+  },
+  isProduction: false,
+  amqp: {
+    url: process.env.AMQP_URL,
+    responseQueueName: 'response-queue',
+    queueName: process.env.SECRET_KEY,
+  },
+
   ffmpegPath: process.env.FFMPEG_PATH,
 };
 
-export default Object.assign(defaults, config.default);
+module.exports = { ...defaults, ...(config[env] || config.development) };

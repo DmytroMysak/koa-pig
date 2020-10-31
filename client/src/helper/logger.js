@@ -1,16 +1,14 @@
-import pino from 'pino';
-import config from '../src/config';
+const pino = require('pino');
+const config = require('../config/index');
 
 // log level: 'fatal', 'error', 'warn', 'info', 'debug', 'trace' or 'silent'
-const pinoConfig = {
-  prettyPrint: config.env === 'production' ? undefined : { translateTime: 'SYS:standard' },
-  level: config.loggerLevel,
-};
-const logger = pino(pinoConfig);
+const logger = pino({
+  prettyPrint: { translateTime: 'SYS:standard' },
+  level: config.logger.level,
+});
 
-if (config.env !== 'development') {
-  pino.destination(`${config.folderToSaveLogs}/results.log`);
+if (config.isProduction) {
+  pino.destination(`${config.logsDirectory}/pig.log`);
 }
 
-
-export default logger;
+module.exports = logger;

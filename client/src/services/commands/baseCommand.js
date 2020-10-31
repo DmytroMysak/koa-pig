@@ -1,28 +1,13 @@
-const i18nService = require('../i18nService');
+const PlayerService = require('../playerService');
 
 module.exports = class BaseCommand {
   constructor() {
-    this.i18n = i18nService;
-    this.voiceChangePrefix = 'voiceChange_';
-    this.languageChangePrefix = 'languageChange_';
-    this.localeChangePrefix = 'localeChange_';
+    this.player = new PlayerService();
+    this.name = null;
+    this.chatId = null;
   }
 
-  sendResponseAndTranslate(input, ctx) {
-    let text;
-    if (Array.isArray(input)) {
-      text = input.map((elem) => {
-        if (elem.translate) {
-          return this.i18n.translate(elem.text, ctx.user.settings.locale);
-        }
-        return elem.text;
-      });
-    } else {
-      text = this.i18n.translate(input, ctx.user.settings.locale);
-    }
-    if (ctx.updateType === 'callback_query') {
-      return ctx.answerCbQuery(text);
-    }
-    return ctx.reply(text);
+  execute(data) {
+    this.chatId = data.chatId;
   }
 };
