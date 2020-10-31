@@ -12,11 +12,9 @@ module.exports = class HelpCommand extends BaseCommand {
     const callMenuText = this.i18n.translate('call_menu', ctx.user.settings.locale);
     const returnCurrentVoiceText = this.i18n.translate('return_current_voice', ctx.user.settings.locale);
     const changeVoiceHelpText = this.i18n.translate('change_voice_help', ctx.user.settings.locale);
-    const returnLanguageListText = this.i18n.translate('return_language_list', ctx.user.settings.locale);
-    const returnVoiceListText = this.i18n.translate('return_voice_list', ctx.user.settings.locale);
     const stopCurrentAudioText = this.i18n.translate('stop_current_audio', ctx.user.settings.locale);
     const changeVolumeHelpText = this.i18n.translate('change_volume_help', ctx.user.settings.locale);
     return ctx.reply(`${commandListText}\n  ${callMenuText}\n  ${returnCurrentVoiceText}\n  ${changeVoiceHelpText}
-  ${returnLanguageListText}\n  ${returnVoiceListText}\n  ${stopCurrentAudioText}\n  ${changeVolumeHelpText}`);
+  ${stopCurrentAudioText}\n  ${changeVolumeHelpText}`);
   }
 };

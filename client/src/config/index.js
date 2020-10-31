@@ -8,6 +8,7 @@ const defaults = {
   folderToSaveLogs: 'logs',
   songFormat: 'mp3',
   secretKey: 'xxx' || process.env.APP_URL,
+  ffmpegPath: process.env.FFMPEG_PATH,
 };
 
 export default Object.assign(defaults, config.default);

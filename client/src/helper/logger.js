@@ -1,5 +1,5 @@
 import pino from 'pino';
-import config from '../config/env';
+import config from '../src/config';
 
 // log level: 'fatal', 'error', 'warn', 'info', 'debug', 'trace' or 'silent'
 const pinoConfig = {

@@ -4,7 +4,7 @@ const BaseCommand = require('./baseCommand');
 module.exports = class ChangeVoiceCommand extends BaseCommand {
   constructor() {
     super();
-    this.name = ['locale', 'lc'];
+    this.name = ['locale'];
     this.type = 'command';
     this.hears = this.i18n.translateAll('language');
   }

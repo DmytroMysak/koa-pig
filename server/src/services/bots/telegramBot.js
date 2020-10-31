@@ -4,6 +4,7 @@ const config = require('../../config/env/index');
 const User = require('../../models/users');
 const i18nService = require('../i18nService');
 const CommandProcessorService = require('../commandProcessorService');
+const clientService = require('../clientService');
 
 module.exports = class TelegramBot {
   constructor(appUrl, port) {
@@ -17,6 +18,7 @@ module.exports = class TelegramBot {
 
   async userMiddleware(ctx, next) {
     logger.debug(ctx.message);
+    clientService.setTelegramInstance(ctx.telegram);
 
     if (!ctx.from) {
       next();
@@ -93,7 +95,7 @@ module.exports = class TelegramBot {
     // this.bot.on('audio', (ctx) => this.workWithAudio(ctx));
     // this.bot.on('voice', (ctx) => this.workWithVoice(ctx));
     // this.bot.on('document', (ctx) => this.workWithDocument(ctx));
-    // this.bot.on('message', (ctx) => this.sendResponseAndTranslate('no_idea_what_to_do', ctx));
+    this.bot.on('message', (ctx) => this.sendResponseAndTranslate('no_idea_what_to_do', ctx));
 
     this.bot.catch((error) => {
       if (!error) {

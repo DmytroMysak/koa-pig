@@ -1,5 +1,5 @@
 const BaseCommand = require('./baseCommand');
-const ClientService = require('../clientService');
+const clientService = require('../clientService');
 const { createFileLink, createFileName } = require('../../helper/util');
 const bucketService = require('../bucketService');
 const awsService = require('../awsService');
@@ -16,29 +16,36 @@ module.exports = class TextCommand extends BaseCommand {
 
   async execute(ctx) {
     const { message: { text } } = ctx;
+    if (text.length > 1500) {
+      return this.sendResponseAndTranslate('sorry_to_big', ctx);
+    }
+    const clientMessage = {
+      volume: ctx.user.settings.volume,
+      chatId: ctx.chat.id,
+    };
+
     if (isUrl(text)) {
       if (!text.includes('youtube')) {
         return this.sendResponseAndTranslate('sorry_only_youtube', ctx);
       }
-      return ClientService.sendToClients({
+      return clientService.sendToClients({
+        ...clientMessage,
         link: text,
-        command: 'play-youtube-song',
-        volume: ctx.user.settings.volume,
+        command: 'play-song-youtube',
       }, ctx.user.selectedClients);
     }
 
     const fileName = createFileName(text, ctx.user.settings.voiceId);
-    const songExist = await bucketService.isExistFile(fileName);
 
-    if (!songExist) {
+    if (!(await bucketService.isExistFile(fileName))) {
       const file = await awsService.createAudioFileFromText(text, ctx.user.settings.voiceId);
       await bucketService.uploadFile(fileName, file);
     }
 
-    return ClientService.sendToClients({
+    return clientService.sendToClients({
+      ...clientMessage,
       link: createFileLink(fileName),
-      command: 'play-song',
-      volume: ctx.user.settings.volume,
+      command: 'play-song-bucket',
     }, ctx.user.selectedClients);
   }
 };

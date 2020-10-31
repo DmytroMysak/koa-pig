@@ -18,7 +18,10 @@ const defaults = {
     name: 'pig-bot-songs',
     url: 'https://storage.googleapis.com',
   },
-  amqpUrl: process.env.AMQP_URL,
+  amqp: {
+    url: process.env.AMQP_URL,
+    responseQueueName: 'response-queue',
+  },
   songFormat: 'mp3',
   telegramVerifyToken: process.env.TELEGRAM_VERITY_TOKEN,
   telegramPath: '/bot/telegram/webhook',
