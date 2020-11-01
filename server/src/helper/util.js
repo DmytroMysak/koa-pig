@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const config = require('../config/env/index');
+const config = require('../config');
 
 const createHash = (x) => crypto.createHash('sha256').update(x, 'utf8').digest('hex');
 

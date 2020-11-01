@@ -1,13 +1,13 @@
 const { uniqBy } = require('lodash');
 const Voices = require('../models/voices');
-const config = require('../config/env');
+const config = require('../config');
 const awsService = require('./awsService');
 
 let voices = [];
 
 module.exports = {
   initialize: async () => {
-    if (config.isProd) {
+    if (config.initializeVoice) {
       await awsService.updateVoice();
     }
     voices = await Voices.find().lean();

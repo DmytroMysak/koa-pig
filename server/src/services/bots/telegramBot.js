@@ -1,6 +1,6 @@
 const Telegraf = require('telegraf');
 const logger = require('../../helper/logger');
-const config = require('../../config/env/index');
+const config = require('../../config');
 const User = require('../../models/users');
 const i18nService = require('../i18nService');
 const CommandProcessorService = require('../commandProcessorService');
@@ -24,10 +24,13 @@ module.exports = class TelegramBot {
       next();
     }
     const { username, first_name: firstName, last_name: lastName, id: telegramId } = ctx.from;
+    // TODO temp solution for testing
+    const clients = [{ accessKey: 'some-random-text', type: 'public', name: 'home-pig' }];
+    const selectedClients = [{ accessKey: 'some-random-text', type: 'public', name: 'home-pig' }];
     try {
       ctx.user = (await User.findOneAndUpdate(
         { telegramId: telegramId.toString() },
-        { telegramId: telegramId.toString(), username, firstName, lastName },
+        { telegramId: telegramId.toString(), username, firstName, lastName, clients, selectedClients },
         { upsert: true, setDefaultsOnInsert: true, new: true },
       )).toJSON();
     } catch (error) {

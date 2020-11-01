@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const config = require('../config/env');
+const config = require('../config');
 const logger = require('../helper/logger');
 const Voice = require('../models/voices');
 

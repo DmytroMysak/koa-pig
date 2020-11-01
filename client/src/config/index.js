@@ -11,7 +11,6 @@ const defaults = {
     level: 'debug',
     logsDirectory: '',
   },
-  isProduction: false,
   amqp: {
     url: process.env.AMQP_URL,
     responseQueueName: 'response-queue',

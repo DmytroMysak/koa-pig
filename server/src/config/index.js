@@ -8,7 +8,13 @@ const env = process.env.NODE_ENV || 'development';
 const config = { development, production };
 
 const defaults = {
-  isProd: false,
+  initializeVoice: false,
+  port: process.env.PORT || 5000,
+  logger: {
+    prettyPrint: { translateTime: 'SYS:standard' },
+    level: 'debug',
+  },
+  logsDirectory: '',
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -28,7 +34,7 @@ const defaults = {
   defaultVoiceId: 'Maxim',
   appUrl: process.env.APP_URL,
   defaultLocale: 'en',
-  localesPath: path.normalize(`${__dirname}/../../../locales`),
+  localesPath: path.normalize(`${__dirname}/../../locales`),
 
   fbVerifyToken: process.env.FB_VERITY_TOKEN,
   fbAccessToken: process.env.FB_ACCESS_TOKEN,

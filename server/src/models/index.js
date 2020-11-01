@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const logger = require('../helper/logger');
-const config = require('../config/env');
+const config = require('../config');
 
 // eslint-disable-next-line import/prefer-default-export
 const dbInitialize = async () => {

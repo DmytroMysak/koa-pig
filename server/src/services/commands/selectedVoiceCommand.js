@@ -1,5 +1,5 @@
 const BaseCommand = require('./baseCommand');
-const config = require('../../config/env');
+const config = require('../../config');
 const voiceService = require('../voiceService');
 
 module.exports = class SelectedVoiceCommand extends BaseCommand {

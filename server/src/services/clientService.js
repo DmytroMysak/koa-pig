@@ -1,6 +1,6 @@
 const amqplib = require('amqplib');
 const logger = require('../helper/logger');
-const config = require('../config/env/index');
+const config = require('../config');
 
 let channel;
 let telegramInstance;

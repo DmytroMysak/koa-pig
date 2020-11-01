@@ -1,4 +1,4 @@
-const config = require('./config/env');
+const config = require('./config');
 const logger = require('./helper/logger');
 const Tunnel = require('./services/httpsTunnel/ngrok');
 const TelegramBot = require('./services/bots/telegramBot');

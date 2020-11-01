@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
-const config = require('../config/env');
+const config = require('../config');
 
 const readDir = promisify(fs.readdir);
 const readFile = promisify(fs.readFile);
