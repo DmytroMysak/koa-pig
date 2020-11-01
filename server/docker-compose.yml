@@ -8,14 +8,14 @@ services:
     container_name: pig-server
     ports:
       - 5000:5000
-  mongodb:
-    image: mongo:4.4
-    restart: always
-    container_name: mongo-db
-    volumes:
-      - mongo_data:/data/db
-    ports:
-      - 27017:27017
-
-volumes:
-  mongo_data:
+#  mongodb:
+#    image: mongo:4.4
+#    restart: always
+#    container_name: mongo-db
+#    volumes:
+#      - mongo_data:/data/db
+#    ports:
+#      - 27017:27017
+#
+#volumes:
+#  mongo_data:
