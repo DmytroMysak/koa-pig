@@ -7,7 +7,7 @@ const logger = pino({
   level: config.logger.level,
 });
 
-if (config.isProduction) {
+if (config.logsDirectory) {
   pino.destination(`${config.logsDirectory}/pig.log`);
 }
 

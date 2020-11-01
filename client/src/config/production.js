@@ -1,5 +1,10 @@
+const path = require('path');
+
 module.exports = {
   env: 'production',
-  port: process.env.PORT || 7070,
   isProduction: true,
+  logger: {
+    level: 'debug',
+    logsDirectory: path.normalize(`${__dirname}/../../logs`),
+  },
 };

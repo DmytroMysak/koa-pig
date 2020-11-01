@@ -4,12 +4,7 @@ const logger = require('./helper/logger');
 const CommandProcessorService = require('./services/commandProcessorService');
 const queueService = require('./services/amqpService');
 
-// Create the songs directory if it doesn't exist
-if (!fs.existsSync(config.songsDirectory)) {
-  fs.mkdirSync(config.songsDirectory);
-}
-// Create the log directory if it does not exist
-if (!fs.existsSync(config.logsDirectory)) {
+if (config.logsDirectory && !fs.existsSync(config.logsDirectory)) {
   fs.mkdirSync(config.logsDirectory);
 }
 

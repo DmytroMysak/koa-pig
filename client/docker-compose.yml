@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  pig:
+    build: .
+    restart: unless-stopped
+    container_name: pig-client
+    environment:
+      REAL_SECRET_KEY: <password>
+      REAL_AMQP_URL: <link>

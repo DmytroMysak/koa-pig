@@ -19,7 +19,7 @@ module.exports = class PlayerService {
       this.process = spawn('ffplay', ['-i', link, '-nodisp', '-volume', volume, '-autoexit']);
       this.process.on('close', (code) => {
         this.process = null;
-        logger.debug('fflay done playing');
+        logger.debug('ffplay done playing');
         resolve(code);
       });
       this.process.stderr.on('error', (error) => {

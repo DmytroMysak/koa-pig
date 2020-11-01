@@ -27,7 +27,7 @@ module.exports = {
           channel.ack(msg);
         })
         .catch((error) => {
-          logger.error('Unexpected error');
+          logger.error('Unexpected error!');
           logger.error(error);
           channel.nack(msg);
         });

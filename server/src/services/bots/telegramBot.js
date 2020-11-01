@@ -17,7 +17,7 @@ module.exports = class TelegramBot {
   }
 
   async userMiddleware(ctx, next) {
-    logger.debug(ctx.message);
+    logger.debug(`Incoming data: ${JSON.stringify(ctx.message || ctx.update, null, 2)}`);
     clientService.setTelegramInstance(ctx.telegram);
 
     if (!ctx.from) {
