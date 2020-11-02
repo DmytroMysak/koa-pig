@@ -1,3 +1,4 @@
+const fs = require('fs');
 const pino = require('pino');
 const config = require('../config/index');
 
@@ -8,6 +9,9 @@ const logger = pino({
 });
 
 if (config.logger.logsDirectory) {
+  if (config.logger.logsDirectory && !fs.existsSync(config.logger.logsDirectory)) {
+    fs.mkdirSync(config.logger.logsDirectory);
+  }
   pino.destination(`${config.logger.logsDirectory}/pig.log`);
 }
 

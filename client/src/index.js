@@ -1,12 +1,6 @@
-const fs = require('fs');
-const config = require('./config');
 const logger = require('./helper/logger');
 const CommandProcessorService = require('./services/commandProcessorService');
 const queueService = require('./services/amqpService');
-
-if (config.logger.logsDirectory && !fs.existsSync(config.logger.logsDirectory)) {
-  fs.mkdirSync(config.logger.logsDirectory);
-}
 
 const main = async () => {
   const commandProcessor = new CommandProcessorService();
