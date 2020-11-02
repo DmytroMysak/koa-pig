@@ -8,21 +8,29 @@ module.exports = class BaseCommand {
     this.localeChangePrefix = 'localeChange_';
   }
 
-  sendResponseAndTranslate(input, ctx) {
+  translate(input) {
     let text;
     if (Array.isArray(input)) {
       text = input.map((elem) => {
         if (elem.translate) {
-          return this.i18n.translate(elem.text, ctx.user.settings.locale);
+          return i18nService.translate(elem.text, this.ctx.user.settings.locale);
         }
         return elem.text;
       });
     } else {
-      text = this.i18n.translate(input, ctx.user.settings.locale);
+      text = i18nService.translate(input, this.ctx.user.settings.locale);
     }
-    if (ctx.updateType === 'callback_query') {
-      return ctx.answerCbQuery(text);
-    }
-    return ctx.reply(text);
+    return text;
+  }
+
+  sendResponseAndTranslate(input, ...args) {
+    // if (this.ctx.updateType === 'callback_query') {
+    //   return this.ctx.answerCbQuery(this.translate(input), ...args);
+    // }
+    return this.ctx.reply(this.translate(input), ...args);
+  }
+
+  execute(ctx) {
+    this.ctx = ctx;
   }
 };

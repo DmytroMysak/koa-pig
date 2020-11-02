@@ -8,6 +8,8 @@ module.exports = class StartCommand extends BaseCommand {
   }
 
   async execute(ctx) {
-    return this.sendResponseAndTranslate('hello_message', ctx);
+    super.execute(ctx);
+
+    return this.sendResponseAndTranslate('hello_message');
   }
 };

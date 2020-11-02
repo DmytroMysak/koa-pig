@@ -2,6 +2,7 @@ const { Markup } = require('telegraf');
 const BaseCommand = require('./baseCommand');
 const SelectedVoiceCommand = require('./selectedVoiceCommand');
 const ChangeVoiceCommand = require('./changeVoiceCommand');
+const MenuCommand = require('./menuCommand');
 const voiceService = require('../voiceService');
 const User = require('../../models/users');
 
@@ -13,6 +14,8 @@ module.exports = class CallbackCommand extends BaseCommand {
   }
 
   async execute(ctx) {
+    super.execute(ctx);
+
     if (ctx.callbackQuery.data === '/selected') {
       return new SelectedVoiceCommand().execute(ctx);
     }
@@ -20,30 +23,45 @@ module.exports = class CallbackCommand extends BaseCommand {
       return new ChangeVoiceCommand().execute(ctx);
     }
     if (ctx.callbackQuery.data.startsWith(this.voiceChangePrefix)) {
-      const voiceId = ctx.callbackQuery.data.replace(this.voiceChangePrefix, '');
-      await User.updateOne({ telegramId: ctx.user.telegramId }, { 'settings.voiceId': voiceId });
-      return this.sendResponseAndTranslate('voice_changed', ctx);
+      return this.changeVoice(ctx);
     }
     if (ctx.callbackQuery.data.startsWith(this.languageChangePrefix)) {
-      const languageId = ctx.callbackQuery.data.replace(this.languageChangePrefix, '');
-      const voiceList = voiceService.getVoicesList(languageId);
-
-      return ctx.reply(
-        this.i18n.translate('voice_list'),
-        Markup.inlineKeyboard(
-          voiceList.map((el) => Markup.callbackButton(
-            `${el.name}(${el.gender}, ${el.languageCode})`,
-            `${this.voiceChangePrefix}${el.id}`,
-          )),
-          { columns: 2 },
-        ).extra(),
-      );
+      return this.changeLanguage(ctx);
     }
     if (ctx.callbackQuery.data.startsWith(this.localeChangePrefix)) {
-      const locale = ctx.callbackQuery.data.replace(this.localeChangePrefix, '');
-      await User.updateOne({ telegramId: ctx.user.telegramId }, { 'settings.locale': locale });
-      return this.sendResponseAndTranslate('localization_changed', ctx);
+      return this.changeLocale(ctx);
     }
-    return this.sendResponseAndTranslate('no_idea_what_to_do', ctx);
+    return this.sendResponseAndTranslate('no_idea_what_to_do');
+  }
+
+  async changeVoice(ctx) {
+    const voiceId = ctx.callbackQuery.data.replace(this.voiceChangePrefix, '');
+    await User.updateOne({ telegramId: ctx.user.telegramId }, { 'settings.voiceId': voiceId });
+    this.ctx.user.settings.voiceId = voiceId;
+
+    return this.sendResponseAndTranslate('voice_changed');
+  }
+
+  async changeLanguage(ctx) {
+    const languageId = ctx.callbackQuery.data.replace(this.languageChangePrefix, '');
+    const voiceList = voiceService.getVoicesList(languageId);
+    const voicesKeyboard = Markup.inlineKeyboard(
+      voiceList.map((el) => Markup.callbackButton(
+        `${el.name}(${el.gender}, ${el.languageCode})`,
+        `${this.voiceChangePrefix}${el.id}`,
+      )),
+      { columns: 2 },
+    ).extra();
+
+    return this.sendResponseAndTranslate('voice_list', voicesKeyboard);
+  }
+
+  async changeLocale(ctx) {
+    const locale = ctx.callbackQuery.data.replace(this.localeChangePrefix, '');
+    await User.updateOne({ telegramId: ctx.user.telegramId }, { 'settings.locale': locale });
+    this.ctx.user.settings.locale = locale;
+    const menu = new MenuCommand().getMenu(ctx);
+
+    return this.sendResponseAndTranslate('localization_changed', menu);
   }
 };

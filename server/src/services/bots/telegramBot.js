@@ -98,7 +98,7 @@ module.exports = class TelegramBot {
     // this.bot.on('audio', (ctx) => this.workWithAudio(ctx));
     // this.bot.on('voice', (ctx) => this.workWithVoice(ctx));
     // this.bot.on('document', (ctx) => this.workWithDocument(ctx));
-    this.bot.on('message', (ctx) => this.sendResponseAndTranslate('no_idea_what_to_do', ctx));
+    // this.bot.on('message', (ctx) => this.sendResponseAndTranslate('no_idea_what_to_do', ctx));
 
     this.bot.catch((error) => {
       if (!error) {

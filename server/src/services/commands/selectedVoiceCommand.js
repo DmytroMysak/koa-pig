@@ -11,8 +11,10 @@ module.exports = class SelectedVoiceCommand extends BaseCommand {
   }
 
   async execute(ctx) {
+    super.execute(ctx);
+
     const voice = voiceService.getById(ctx.user.settings.voiceId || config.defaultVoiceId);
 
-    return this.sendResponseAndTranslate(`${voice.name}(${voice.gender}, ${voice.languageName})`, ctx);
+    return this.sendResponseAndTranslate(`${voice.name}(${voice.gender}, ${voice.languageName})`);
   }
 };

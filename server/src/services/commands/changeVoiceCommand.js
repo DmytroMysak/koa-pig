@@ -11,11 +11,13 @@ module.exports = class ChangeVoiceCommand extends BaseCommand {
   }
 
   execute(ctx) {
+    super.execute(ctx);
+
     const languageListButton = voiceService.getLanguagesList()
       .map((el) => Markup.callbackButton(el.name, `${this.languageChangePrefix}${el.code}`));
 
-    return ctx.reply(
-      this.i18n.translate('voice_list'),
+    return this.sendResponseAndTranslate(
+      'voice_list',
       Markup.inlineKeyboard(languageListButton, { columns: 2 }).extra(),
     );
   }

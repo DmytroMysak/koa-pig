@@ -9,6 +9,8 @@ module.exports = class ManageClientCommand extends BaseCommand {
   }
 
   execute(ctx) {
-    return ctx.reply('TO DO');
+    super.execute(ctx);
+
+    return this.sendResponseAndTranslate('TO DO');
   }
 };

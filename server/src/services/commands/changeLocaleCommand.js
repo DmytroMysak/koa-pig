@@ -10,11 +10,13 @@ module.exports = class ChangeVoiceCommand extends BaseCommand {
   }
 
   execute(ctx) {
-    return ctx.reply(
-      this.i18n.translate('localization'),
+    super.execute(ctx);
+
+    return this.sendResponseAndTranslate(
+      'localization',
       Markup.inlineKeyboard(
         this.i18n.localeList().map((locale) => (
-          Markup.callbackButton(this.i18n.translate(locale), `${this.localeChangePrefix}${locale}`))),
+          Markup.callbackButton(this.translate(locale), `${this.localeChangePrefix}${locale}`))),
       ).extra(),
     );
   }

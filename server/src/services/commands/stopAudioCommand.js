@@ -8,8 +8,9 @@ module.exports = class StopAudioCommand extends BaseCommand {
     this.type = 'command';
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async execute(ctx) {
+    super.execute(ctx);
+
     return ClientService.sendToClients({ command: 'stop-song' }, ctx.user.selectedClients);
   }
 };
