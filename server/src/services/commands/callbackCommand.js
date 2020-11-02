@@ -4,7 +4,6 @@ const SelectedVoiceCommand = require('./selectedVoiceCommand');
 const ChangeVoiceCommand = require('./changeVoiceCommand');
 const MenuCommand = require('./menuCommand');
 const voiceService = require('../voiceService');
-const User = require('../../models/users');
 
 module.exports = class CallbackCommand extends BaseCommand {
   constructor() {
@@ -36,8 +35,7 @@ module.exports = class CallbackCommand extends BaseCommand {
 
   async changeVoice(ctx) {
     const voiceId = ctx.callbackQuery.data.replace(this.voiceChangePrefix, '');
-    await User.updateOne({ telegramId: ctx.user.telegramId }, { 'settings.voiceId': voiceId });
-    this.ctx.user.settings.voiceId = voiceId;
+    await this.updateUser(ctx, { 'settings.voiceId': voiceId });
 
     return this.sendResponseAndTranslate('voice_changed');
   }
@@ -58,8 +56,7 @@ module.exports = class CallbackCommand extends BaseCommand {
 
   async changeLocale(ctx) {
     const locale = ctx.callbackQuery.data.replace(this.localeChangePrefix, '');
-    await User.updateOne({ telegramId: ctx.user.telegramId }, { 'settings.locale': locale });
-    this.ctx.user.settings.locale = locale;
+    await this.updateUser(ctx, { 'settings.locale': locale });
     const menu = new MenuCommand().getMenu(ctx);
 
     return this.sendResponseAndTranslate('localization_changed', menu);

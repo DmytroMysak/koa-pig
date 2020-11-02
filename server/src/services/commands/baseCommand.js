@@ -1,4 +1,5 @@
 const i18nService = require('../i18nService');
+const User = require('../../models/users');
 
 module.exports = class BaseCommand {
   constructor() {
@@ -24,10 +25,22 @@ module.exports = class BaseCommand {
   }
 
   sendResponseAndTranslate(input, ...args) {
-    // if (this.ctx.updateType === 'callback_query') {
-    //   return this.ctx.answerCbQuery(this.translate(input), ...args);
-    // }
+    if (this.ctx.updateType === 'callback_query') {
+      return Promise.all([
+        this.ctx.answerCbQuery(this.translate(input)),
+        this.ctx.reply(this.translate(input), ...args),
+      ]);
+    }
     return this.ctx.reply(this.translate(input), ...args);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async updateUser(ctx, update) {
+    ctx.user = (await User.findOneAndUpdate(
+      { telegramId: ctx.user.telegramId },
+      update,
+      { upsert: true, setDefaultsOnInsert: true, new: true },
+    )).toJSON();
   }
 
   execute(ctx) {

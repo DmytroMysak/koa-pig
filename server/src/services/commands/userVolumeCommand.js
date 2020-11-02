@@ -1,5 +1,4 @@
 const BaseCommand = require('./baseCommand');
-const User = require('../../models/users');
 
 module.exports = class UserVolumeCommand extends BaseCommand {
   constructor() {
@@ -16,8 +15,8 @@ module.exports = class UserVolumeCommand extends BaseCommand {
     if (!volume || Number.isNaN(volume)) {
       return this.sendResponseAndTranslate('bad_volume_value');
     }
-    await User.updateOne({ telegramId: ctx.user.telegramId }, { 'settings.volume': volume });
-    this.ctx.user.settings.volume = volume;
-    this.sendResponseAndTranslate('volume_changed');
+    await this.updateUser(ctx, { 'settings.volume': volume });
+
+    return this.sendResponseAndTranslate('volume_changed');
   }
 };
