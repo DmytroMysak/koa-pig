@@ -1,9 +1,22 @@
-## <small>0.7.2 (2020-10-16)</small>
+## <small>0.9.2 (2020-11-03)</small>
 
-* docs(changelog): generate init changelog ([2cddf3d](https://github.com/DmytroMysak/koa-pig/commit/2cddf3d))
-* docs(package.json): use commitizen for changelog ([9341010](https://github.com/DmytroMysak/koa-pig/commit/9341010))
-* chore(version): update version ([103b4f7](https://github.com/DmytroMysak/koa-pig/commit/103b4f7))
-* refactor(changelog): delete unsed libraries. Formated file name ([6f1b117](https://github.com/DmytroMysak/koa-pig/commit/6f1b117))
+* fix(server): fixed regex ([073bd09](https://github.com/DmytroMysak/koa-pig/commit/073bd09))
+
+
+
+## <small>v0.9.2 (2020-11-03)</small>
+
+* ci: version bump to v0.9.2 ([15a394f](https://github.com/DmytroMysak/koa-pig/commit/15a394f))
+
+
+
+## <small>v0.9.1 (2020-11-03)</small>
+
+* ci: version bump to v0.9.1 ([e779a13](https://github.com/DmytroMysak/koa-pig/commit/e779a13))
+* ci(ci): try to fix bump version ci ([2b3a448](https://github.com/DmytroMysak/koa-pig/commit/2b3a448))
+* ci(ci): try to fixe ci (2) ([9afa27e](https://github.com/DmytroMysak/koa-pig/commit/9afa27e))
+* ci(ci): try to fixe ci (3) ([5bc49ff](https://github.com/DmytroMysak/koa-pig/commit/5bc49ff))
+* ci(ci): try to fixe ci (4) ([9353e8b](https://github.com/DmytroMysak/koa-pig/commit/9353e8b))
 * add all functionality from mock command ([2529a65](https://github.com/DmytroMysak/koa-pig/commit/2529a65))
 * add correct permission to sh script ([e43f795](https://github.com/DmytroMysak/koa-pig/commit/e43f795))
 * add ervice for startup ([7dd7bb1](https://github.com/DmytroMysak/koa-pig/commit/7dd7bb1))
@@ -31,6 +44,12 @@
 * change from localtunnel to ngrok, add speak voice, fix a lot of minor bugs, refactor audioBL and pig ([de90f46](https://github.com/DmytroMysak/koa-pig/commit/de90f46))
 * change tunneling program from serveo to localtunnel ([4ac6a7a](https://github.com/DmytroMysak/koa-pig/commit/4ac6a7a))
 * commit all my work ([71aa5ae](https://github.com/DmytroMysak/koa-pig/commit/71aa5ae))
+* Create client.yml ([976fbba](https://github.com/DmytroMysak/koa-pig/commit/976fbba))
+* Create codeql-analysis.yml ([189a07b](https://github.com/DmytroMysak/koa-pig/commit/189a07b))
+* Create node.js.yml ([20ad0f2](https://github.com/DmytroMysak/koa-pig/commit/20ad0f2))
+* Create server.yml ([becc450](https://github.com/DmytroMysak/koa-pig/commit/becc450))
+* Delete client.yml ([f32c644](https://github.com/DmytroMysak/koa-pig/commit/f32c644))
+* Delete server.yml ([7989ad2](https://github.com/DmytroMysak/koa-pig/commit/7989ad2))
 * delete unused code, add roles, add client validation ([6e97345](https://github.com/DmytroMysak/koa-pig/commit/6e97345))
 * delete unused files, update package.json ([40919e2](https://github.com/DmytroMysak/koa-pig/commit/40919e2))
 * delete unused import, enable all init functions ([f5ba9bf](https://github.com/DmytroMysak/koa-pig/commit/f5ba9bf))
@@ -64,6 +83,7 @@
 * migration to css ([e54d7bc](https://github.com/DmytroMysak/koa-pig/commit/e54d7bc))
 * Move files ([f9c66eb](https://github.com/DmytroMysak/koa-pig/commit/f9c66eb))
 * refactor server/app ([2fc9dfd](https://github.com/DmytroMysak/koa-pig/commit/2fc9dfd))
+* refactor(localization, clients, menu): refactor localixation, added rabbit ([156f420](https://github.com/DmytroMysak/koa-pig/commit/156f420))
 * remove songs ([7f43876](https://github.com/DmytroMysak/koa-pig/commit/7f43876))
 * restore aws ([fbfd869](https://github.com/DmytroMysak/koa-pig/commit/fbfd869))
 * Save my work :) ([c81851a](https://github.com/DmytroMysak/koa-pig/commit/c81851a))
@@ -80,6 +100,20 @@
 * update version ([d921460](https://github.com/DmytroMysak/koa-pig/commit/d921460))
 * Working server :) ([e63769f](https://github.com/DmytroMysak/koa-pig/commit/e63769f))
 * working server version ([fa4d0a6](https://github.com/DmytroMysak/koa-pig/commit/fa4d0a6))
+* fix(client): fixed a lot of bug after first start ([5d0e762](https://github.com/DmytroMysak/koa-pig/commit/5d0e762))
+* fix(server): fixed callback query response ([a9d7b83](https://github.com/DmytroMysak/koa-pig/commit/a9d7b83))
+* fix(server): server stop working after 4-8h ([173e13f](https://github.com/DmytroMysak/koa-pig/commit/173e13f))
+* feat(client): pm2 start command ([d494aa8](https://github.com/DmytroMysak/koa-pig/commit/d494aa8))
+* feat(server): added dockerfile and docker compose ([672c046](https://github.com/DmytroMysak/koa-pig/commit/672c046))
+* feat(server): small refactoring + update cb response ([ee1e0da](https://github.com/DmytroMysak/koa-pig/commit/ee1e0da))
+* build(database): disable mongo from docker compose ([503f279](https://github.com/DmytroMysak/koa-pig/commit/503f279))
+* refactor(change voice): change voice command (first select language then select voice) ([4cc647d](https://github.com/DmytroMysak/koa-pig/commit/4cc647d))
+* refactor(changelog): delete unsed libraries. Formated file name ([6f1b117](https://github.com/DmytroMysak/koa-pig/commit/6f1b117))
+* refactor(client): pig, working version ([cfc2060](https://github.com/DmytroMysak/koa-pig/commit/cfc2060))
+* perf(client): client refactoring, change command name on server. Pig working ([b65e1ea](https://github.com/DmytroMysak/koa-pig/commit/b65e1ea))
+* docs(changelog): generate init changelog ([2cddf3d](https://github.com/DmytroMysak/koa-pig/commit/2cddf3d))
+* docs(package.json): use commitizen for changelog ([9341010](https://github.com/DmytroMysak/koa-pig/commit/9341010))
+* chore(version): update version ([103b4f7](https://github.com/DmytroMysak/koa-pig/commit/103b4f7))
 
 
 
