@@ -25,6 +25,6 @@ module.exports = class Serveo {
   }
 
   getUrlAddress() {
-    return this.stdoutData.match(/https:\/\/[\w]+.serveo.net/g)[0];
+    return this.stdoutData.match(/https:\/\/[\w]+\.serveo\.net/g)[0];
   }
 };
