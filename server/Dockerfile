@@ -8,10 +8,7 @@ RUN npm ci --production
 
 COPY src/ src/
 COPY locales/ locales/
-# TODO remove later
-COPY .env .env
-COPY service-account.json service-account.json
 
-ENV NODE_ENV=production
+EXPOSE: 5000
 
 CMD ["npm", "run", "start:prod"]
