@@ -10,9 +10,13 @@ const { dbInitialize } = require('./models/index');
 const createAppUrl = async () => {
   const tunnel = new Tunnel(config.port);
   await tunnel.start();
-
   const appUrl = tunnel.getUrlAddress();
   logger.debug(`App url: ${appUrl}`);
+
+  setTimeout(() => {
+    logger.debug('Restart app every 4 hours. Ngrok workaround!');
+    process.exit(0);
+  }, 4 * 60 * 60 * 1000);
 
   return appUrl;
 };
