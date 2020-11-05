@@ -1,6 +1,5 @@
 const config = require('./config');
 const logger = require('./helper/logger');
-const Tunnel = require('./services/httpsTunnel/ngrok');
 const TelegramBot = require('./services/bots/telegramBot');
 const voiceService = require('./services/voiceService');
 const i18nService = require('./services/i18nService');
@@ -8,10 +7,10 @@ const clientService = require('./services/clientService');
 const { dbInitialize } = require('./models/index');
 
 const createAppUrl = async () => {
+  const Tunnel = await import('./services/httpsTunnel/ngrok');
   const tunnel = new Tunnel(config.port);
   await tunnel.start();
   const appUrl = tunnel.getUrlAddress();
-  logger.debug(`App url: ${appUrl}`);
 
   setTimeout(() => {
     logger.debug('Restart app every 4 hours. Ngrok workaround!');
@@ -30,8 +29,9 @@ const main = async () => {
   ]);
 
   const appUrl = config.createAppUrl ? (await createAppUrl()) : config.appUrl;
-  const telegramBot = new TelegramBot(appUrl, config.port);
+  logger.debug(`App url: ${appUrl}`);
 
+  const telegramBot = new TelegramBot(appUrl, config.port);
   await telegramBot.start();
   logger.debug('Telegram bot started');
 };
