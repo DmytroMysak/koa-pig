@@ -9,6 +9,4 @@ RUN npm ci --production
 COPY src/ src/
 COPY locales/ locales/
 
-EXPOSE: 5000
-
 CMD ["npm", "run", "start:prod"]
