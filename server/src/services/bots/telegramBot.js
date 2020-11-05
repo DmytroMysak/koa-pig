@@ -40,18 +40,6 @@ module.exports = class TelegramBot {
     next();
   }
 
-  // telegramErrorLogging(error, ctx) {
-  //   if (error.name !== 'ValidationError') {
-  //     return logger.error(error);
-  //   }
-  //   if (Array.isArray(error.message)) {
-  //     logger.info(error.message.map((elem) => elem.text).join(' '));
-  //   } else {
-  //     logger.info(error.message);
-  //   }
-  //   return this.sendResponseAndTranslate(error.message, ctx);
-  // }
-  //
   // workWithAudio(ctx, data = null) {
   //   const params = {
   //     fileId: data ? data.file_id : ctx.message.audio.file_id,
