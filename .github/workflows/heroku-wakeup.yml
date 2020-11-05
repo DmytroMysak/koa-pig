@@ -9,4 +9,4 @@ jobs:
       - name: curl
         uses: wei/curl@v1
         with:
-          args: '-o /dev/null https://little-pig-bot.herokuapp.com 2>&1'
+          args: '-o /dev/null https://little-pig-bot.herokuapp.com &> /dev/null'
