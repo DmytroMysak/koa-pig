@@ -1,7 +1,7 @@
 name: Heroku Awake
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/30 * * * *"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -9,4 +9,4 @@ jobs:
       - name: curl
         uses: wei/curl@v1
         with:
-          args: '-s -o /dev/null https://little-pig-bot.herokuapp.com'
+          args: '-o /dev/null https://little-pig-bot.herokuapp.com 2>&1'
