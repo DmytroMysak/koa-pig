@@ -7,7 +7,7 @@ const clientService = require('./services/clientService');
 const { dbInitialize } = require('./models/index');
 
 const createAppUrl = async () => {
-  const Tunnel = await import('./services/httpsTunnel/ngrok');
+  const { default: Tunnel } = await import('./services/httpsTunnel/ngrok.js');
   const tunnel = new Tunnel(config.port);
   await tunnel.start();
   const appUrl = tunnel.getUrlAddress();
@@ -28,7 +28,7 @@ const main = async () => {
     clientService.initialize(),
   ]);
 
-  const appUrl = config.createAppUrl ? (await createAppUrl()) : config.appUrl;
+  const appUrl = config.appUrl ? config.appUrl : (await createAppUrl());
   logger.debug(`App url: ${appUrl}`);
 
   const telegramBot = new TelegramBot(appUrl, config.port);

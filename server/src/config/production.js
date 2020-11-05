@@ -4,7 +4,6 @@ module.exports = {
   env: 'production',
   initializeVoice: true,
   logsDirectory: path.normalize(`${__dirname}/../../logs`),
-  createAppUrl: false,
   amqp: {
     url: process.env.AMQP_URL || process.env.CLOUDAMQP_URL,
     responseQueueName: 'response-queue',

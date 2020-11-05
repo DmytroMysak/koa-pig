@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
-const config = require('../config');
 
 const readDir = promisify(fs.readdir);
 const readFile = promisify(fs.readFile);
@@ -9,13 +8,13 @@ const locales = new Map();
 
 module.exports = {
   async initialize() {
-    const fileNames = await readDir(config.localesPath);
+    const fileNames = await readDir(path.normalize(`${__dirname}../../../locales`));
     const files = fileNames
       .map((file) => path.parse(file))
       .filter((file) => file.ext === '.json')
       .map((file) => Promise.all([
         file.name,
-        readFile(`${config.localesPath}/${file.base}`),
+        readFile(path.normalize(`${__dirname}../../../locales/${file.base}`)),
       ]));
 
     // eslint-disable-next-line no-restricted-syntax
@@ -24,7 +23,7 @@ module.exports = {
     }
   },
 
-  translate: (label, currentLocale = config.defaultLocale) => locales.get(currentLocale)[label] || label,
+  translate: (label, currentLocale = 'en') => locales.get(currentLocale)[label] || label,
 
   translateAll: (label) => [...locales.keys()].map((key) => locales.get(key)[label] || label),
 

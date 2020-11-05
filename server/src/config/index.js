@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-const path = require('path');
 const development = require('./development');
 const production = require('./production');
 
@@ -9,7 +8,6 @@ const config = { development, production };
 
 const defaults = {
   initializeVoice: false,
-  createAppUrl: true,
   port: process.env.PORT || 5000,
   logger: {
     prettyPrint: { translateTime: 'SYS:standard' },
@@ -37,11 +35,8 @@ const defaults = {
   telegramVerifyToken: process.env.TELEGRAM_VERITY_TOKEN,
   telegramPath: '/bot/telegram/webhook',
   appUrl: process.env.APP_URL,
-
   defaultVoiceId: 'Maxim',
-  defaultLocale: 'en',
 
-  localesPath: path.normalize(`${__dirname}/../../locales`),
   fbVerifyToken: process.env.FB_VERITY_TOKEN,
   fbAccessToken: process.env.FB_ACCESS_TOKEN,
 };
