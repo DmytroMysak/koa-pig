@@ -1,9 +1,13 @@
 require('dotenv').config();
 
+const _ = require('lodash');
 const development = require('./development');
 const production = require('./production');
 
 const env = process.env.NODE_ENV || 'development';
+if (!['development', 'production'].includes(env)) {
+  throw new Error('Unexpected env');
+}
 const config = { development, production };
 
 const defaults = {
@@ -13,7 +17,6 @@ const defaults = {
     prettyPrint: { translateTime: 'SYS:standard' },
     level: 'debug',
   },
-  logsDirectory: '',
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -31,6 +34,16 @@ const defaults = {
     url: process.env.AMQP_URL,
     responseQueueName: 'response-queue',
   },
+  mongoose: {
+    options: {
+      socketTimeoutMS: 0,
+      keepAlive: true,
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
+    },
+  },
   songFormat: 'mp3',
   telegramVerifyToken: process.env.TELEGRAM_VERITY_TOKEN,
   telegramPath: '/bot/telegram/webhook',
@@ -41,4 +54,4 @@ const defaults = {
   fbAccessToken: process.env.FB_ACCESS_TOKEN,
 };
 
-module.exports = { ...defaults, ...(config[env] || config.development) };
+module.exports = _.merge(defaults, config[env]);

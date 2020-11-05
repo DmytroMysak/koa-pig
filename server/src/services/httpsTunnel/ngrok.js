@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const ngrok = require('ngrok');
 
 module.exports = class Ngrok {
