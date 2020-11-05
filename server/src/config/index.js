@@ -20,6 +20,10 @@ const defaults = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     region: process.env.AWS_REGION || 'eu-west-1',
   },
+  google: {
+    clientEmail: process.env.GOOGLE_CLIENT_EMAIL,
+    privateKey: process.env.GOOGLE_PRIVATE_KEY,
+  },
   bucket: {
     name: 'pig-bot-songs',
     url: 'https://storage.googleapis.com',

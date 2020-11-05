@@ -1,7 +1,12 @@
 const { Storage } = require('@google-cloud/storage');
 const config = require('../config');
 
-const storage = new Storage();
+const storage = new Storage({
+  credentials: {
+    client_email: config.google.clientEmail,
+    private_key: config.google.privateKey,
+  },
+});
 const bucket = storage.bucket(config.bucket.name);
 
 module.exports = {
