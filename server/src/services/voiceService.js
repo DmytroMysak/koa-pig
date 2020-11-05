@@ -21,7 +21,7 @@ module.exports = {
   getById: (id) => voices.find((el) => el.id === id),
 
   getLanguagesList: () => uniqBy(voices, 'code').map((el) => ({
-    name: el.languageName.split(' ')[0],
+    name: el.languageName.split(' ')[1] ?? el.languageName,
     languageCode: el.languageCode,
     code: el.code,
   })),
