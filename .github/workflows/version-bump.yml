@@ -16,9 +16,10 @@ jobs:
         uses: 'phips28/gh-action-bump-version@v8.0.12'
         with:
           PACKAGEJSON_DIR: 'server'
-          skip-tag: "true"
+          INPUT_SKIP-TAG: "true"
         env:
           PACKAGEJSON_DIR: 'server'
+          INPUT_SKIP-TAG: "true"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Automated Version Bump Client'
