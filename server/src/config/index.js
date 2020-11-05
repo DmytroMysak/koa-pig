@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const _ = require('lodash');
+const { merge } = require('lodash');
 const development = require('./development');
 const production = require('./production');
 
@@ -54,4 +54,4 @@ const defaults = {
   fbAccessToken: process.env.FB_ACCESS_TOKEN,
 };
 
-module.exports = _.merge(defaults, config[env]);
+module.exports = merge(defaults, config[env]);
