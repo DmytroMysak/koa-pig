@@ -9,6 +9,7 @@ const config = { development, production };
 
 const defaults = {
   initializeVoice: false,
+  createAppUrl: true,
   port: process.env.PORT || 5000,
   logger: {
     prettyPrint: { translateTime: 'SYS:standard' },
@@ -18,7 +19,7 @@ const defaults = {
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION || 'eu-west-1',
+    region: process.env.AWS_REGION,
   },
   google: {
     clientEmail: process.env.GOOGLE_CLIENT_EMAIL,
@@ -35,11 +36,12 @@ const defaults = {
   songFormat: 'mp3',
   telegramVerifyToken: process.env.TELEGRAM_VERITY_TOKEN,
   telegramPath: '/bot/telegram/webhook',
-  defaultVoiceId: 'Maxim',
   appUrl: process.env.APP_URL,
-  defaultLocale: 'en',
-  localesPath: path.normalize(`${__dirname}/../../locales`),
 
+  defaultVoiceId: 'Maxim',
+  defaultLocale: 'en',
+
+  localesPath: path.normalize(`${__dirname}/../../locales`),
   fbVerifyToken: process.env.FB_VERITY_TOKEN,
   fbAccessToken: process.env.FB_ACCESS_TOKEN,
 };

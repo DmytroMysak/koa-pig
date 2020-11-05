@@ -1,6 +1,5 @@
 module.exports = {
   env: 'development',
-  createAppUrl: true,
   mongoose: {
     debug: true,
     uri: process.env.MONGO_URL,
