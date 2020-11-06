@@ -1,77 +1,37 @@
-# bot-pig client
-Just speak and cache song
+## Little pig bot client
+Just speak song from telegram
 
-## Goal
-- easy install
-- have queue
-- have unique identify
+### Goal
+- [ ] docker image for client
 
 
-// old
-
-## Install
-
+###Require:
+for speaker, fluent-ffmpeg libraries
 ```sh
-sudo apt-get install mplayer ffmpeg;
+sudo apt-get install libasound2-dev
+sudo apt-get install ffmpeg
 ```
-if you have some problem with installing ffmpeg, use static build from https://johnvansickle.com/ffmpeg/
-then add to .env file FFMPEG_PATH=/full/path/to/ffmpeg/ffmpeg
 
-if you don't have postgresql install it or use remote one but don't forget to change credential in config/env or .env file
+###Install
 ```sh
-sudo apt-get install postgresql-client postgresql postgresql-contrib;
+npm i
 ```
-Add new user or use user which already exist
+
+###Start
 ```sh
-sudo -u postgres createuser -D -A -P littlePig;
+npm run start:prod
 ```
-Create new DB
+
+### Start (using pm2)
+
+####Install pm2
 ```sh
-sudo -u postgres createdb -O littlePig little_pig;
+npm i -g pm2
+pm2 startup
+# run script from console
 ```
-add extension to new DB
+
+####start app
 ```sh
-sudo su - postgres;
-psql little_pig;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-\q
-exit;
+npm run start:pm2
 ```
-
-create .env file
-```sh
-touch .env;
-```
-
-fill in this file with:
-```
-AWS_ACCESS_KEY_ID=<YOUR AWS accessKeyId>
-AWS_SECRET_ACCESS_KEY=<YOUR AWS secretAccessKey>
-AWS_REGION=<YOUR AWS REGION>
-DB_PASSWORD=<PASSWORD TO DB>
-TELEGRAM_VERITY_TOKEN=<TELEGRAM_BOT_TOKEN>
-```
-
-Don't forget to use AWS POLLY.
-
-## Getting Started
-
-to start app enter:
-./start-prod.sh
-
-## TODO
-
-- [x] delete unused package
-     - axios
-     - body-parser
-     - compression
-     - cors
-     - express
-     - express-winston
-     - helmet
-- [x] ngrock own wrapper or use ngrock analog
-- [ ] use mjs or require(to delete gulp, babel etc)
-- [ ] change winston
-- [ ] pm2 analog
-- [ ] add funny response for sticker or photo
-

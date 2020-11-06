@@ -1,11 +1,9 @@
+const isUrl = require('is-url');
 const BaseCommand = require('./baseCommand');
 const clientService = require('../clientService');
-const { createFileLink, createFileName } = require('../../helper/util');
+const { createFileLink, createFileName, getYoutubeId } = require('../../helper/util');
 const bucketService = require('../bucketService');
 const awsService = require('../awsService');
-
-// eslint-disable-next-line max-len
-const isUrl = (text) => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi.test(text.toString());
 
 module.exports = class TextCommand extends BaseCommand {
   constructor() {
@@ -18,58 +16,54 @@ module.exports = class TextCommand extends BaseCommand {
     super.execute(ctx);
     const { message: { text } } = ctx;
 
+    if (isUrl(text)) {
+      return this.processUrl(text);
+    }
     if (text.length > 1500) {
       return this.sendResponseAndTranslate('sorry_to_big');
     }
-    if (isUrl(text)) {
-      return this.processUrl(text, ctx);
-    }
-    return this.processText(text, ctx);
+    return this.processText(text);
   }
 
-  async processUrl(text, ctx) {
-    // TODO
-    return this.sendResponseAndTranslate('no_idea_what_to_do');
-
-    if (!text.includes('youtube')) {
+  async processUrl(text) {
+    if (!getYoutubeId(text)) {
       return this.sendResponseAndTranslate('sorry_only_youtube');
     }
-
     return clientService.sendToClients({
-      volume: ctx.user.settings.volume,
-      chatId: ctx.chat.id,
+      volume: this.ctx.user.settings.volume,
+      chatId: this.ctx.chat.id,
       link: text,
       command: 'play-song-youtube',
-    }, ctx.user.selectedClients);
+    }, this.ctx.user.selectedClients);
   }
 
-  async processText(text, ctx) {
-    const fileName = createFileName(text, ctx.user.settings.voiceId);
+  async processText(text) {
+    const fileName = createFileName(text, this.ctx.user.settings.voiceId);
 
     if (!(await bucketService.isExistFile(fileName))) {
-      const file = await awsService.createAudioFileFromText(text, ctx.user.settings.voiceId);
+      const file = await awsService.createAudioFileFromText(text, this.ctx.user.settings.voiceId);
       await bucketService.uploadFile(fileName, file);
     }
 
     return Promise.all([
-      this.sendAudio(text, fileName, ctx),
+      this.sendAudio(text, fileName),
       clientService.sendToClients({
-        volume: ctx.user.settings.volume,
-        chatId: ctx.chat.id,
+        volume: this.ctx.user.settings.volume,
+        chatId: this.ctx.chat.id,
         link: createFileLink(fileName),
         command: 'play-song-bucket',
-      }, ctx.user.selectedClients),
+      }, this.ctx.user.selectedClients),
     ]);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async sendAudio(text, fileName, ctx) {
-    const title = text.length > 13 ? `${text.substring(0, 10)}...` : text;
-    return ctx.replyWithAudio({ url: createFileLink(fileName), filename: title }, {
+  async sendAudio(text, fileName) {
+    const title = text.length > 23 ? `${text.substring(0, 20)}...` : text;
+
+    return this.ctx.replyWithAudio({ url: createFileLink(fileName), filename: title }, {
       performer: 'Little Pig Bot',
       title,
       disable_notification: true,
-      reply_to_message_id: ctx.message.message_id,
+      reply_to_message_id: this.ctx.message.message_id,
     });
   }
 };

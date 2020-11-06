@@ -13,7 +13,7 @@ module.exports = {
   processMessages: async (processor) => {
     await channel.consume(config.amqp.queueName, (msg) => {
       if (!msg) {
-        return channel.nack();
+        return channel.nack(msg);
       }
       const message = JSON.parse(msg.content.toString());
       logger.debug(`Message from server: ${JSON.stringify(message, null, 2)}`);

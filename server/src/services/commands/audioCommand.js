@@ -10,7 +10,13 @@ module.exports = class AudioCommand extends BaseCommand {
 
   async execute(ctx) {
     super.execute(ctx);
-    const link = await ctx.telegram.getFileLink(ctx.update.message.audio.file_id);
+    let link;
+    try {
+      link = await ctx.telegram.getFileLink(ctx.update.message.audio.file_id);
+    } catch {
+      // TO DO, send error file too big
+      debugger;
+    }
 
     return clientService.sendToClients({
       volume: ctx.user.settings.volume,

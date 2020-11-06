@@ -14,8 +14,14 @@ module.exports = class CommandProcessorService {
     return this;
   }
 
-  addCommand(command) {
-    this.commands.set(command.name, command);
+  addCommand(Command) {
+    const command = new Command();
+
+    if (Array.isArray(command.name)) {
+      command.name.forEach((name) => this.commands.set(name, new Command()));
+    } else {
+      this.commands.set(command.name, command);
+    }
   }
 
   async selectCommandAndExecute(data) {
@@ -34,6 +40,6 @@ module.exports = class CommandProcessorService {
       // eslint-disable-next-line global-require,import/no-dynamic-require
       .map((file) => require(`${__dirname}/commands/${file.base}`));
 
-    commands.forEach((Command) => this.addCommand(new Command()));
+    commands.forEach((Command) => this.addCommand(Command));
   }
 };

@@ -7,16 +7,22 @@
   "license": "MIT",
   "scripts": {
     "start": "cross-env NODE_ENV=development node src/index.js",
-    "start:pm2": "cross-env NODE_ENV=production pm2 start src/index.js --name pig-client",
+    "start:pm2": "cross-env NODE_ENV=production pm2 start src/index.js --name pig-client && pm2 save",
     "start:prod": "cross-env NODE_ENV=production node src/index.js"
+  },
+  "engines": {
+    "node": "14.x"
   },
   "dependencies": {
     "amqplib": "^0.6.0",
     "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
+    "fluent-ffmpeg": "^2.1.2",
     "p-queue": "^6.6.2",
     "pino": "^6.7.0",
-    "pino-pretty": "^4.3.0"
+    "pino-pretty": "^4.3.0",
+    "speaker": "^0.5.2",
+    "ytdl-core": "^4.0.3"
   },
   "devDependencies": {
     "eslint": "^7.12.1",

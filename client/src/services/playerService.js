@@ -1,7 +1,7 @@
-/* eslint-disable no-underscore-dangle */
 const { default: PQueue } = require('p-queue');
-const { spawn } = require('child_process');
+const Speaker = require('speaker');
 const logger = require('../helper/logger');
+const { getFfmpeg } = require('../helper/util');
 
 module.exports = class PlayerService {
   constructor() {
@@ -9,35 +9,28 @@ module.exports = class PlayerService {
       return PlayerService.instance;
     }
     PlayerService.instance = this;
+
     this.queue = new PQueue({ concurrency: 1 });
     this.process = null;
+    this.speaker = new Speaker();
+    this.updateSpeaker = (function updateSpeaker(codec) {
+      this.speaker.channels = codec.audio_details[2] === 'mono' ? 1 : 2;
+      this.speaker.sampleRate = parseInt(codec.audio_details[1].match(/\d+/)[0], 10);
+    }).bind(this);
+
     return this;
   }
 
-  async _play({ volume, link }) {
-    return new Promise((resolve, reject) => {
-      this.process = spawn('ffplay', ['-i', link, '-nodisp', '-volume', volume, '-autoexit']);
-      this.process.on('close', (code) => {
-        this.process = null;
-        logger.debug('ffplay done playing');
-        resolve(code);
-      });
-      this.process.stderr.on('error', (error) => {
-        this.process = null;
-        logger.error('Some error from fflay');
-        reject(error);
-      });
-      // without this line -autoexit not working (((
-      this.process.stderr.on('data', () => {});
-    });
+  /**
+   * @param {{ volume: number, chatId: string, link: string, command: string }} audioData
+   * @return {Promise}
+   */
+  addToQueue(audioData) {
+    return this.queue.add(() => this.play(audioData));
   }
 
   stopSong() {
-    this.process?.kill('SIGINT');
-  }
-
-  addToQueue(audioData) {
-    return this.queue.add(() => this._play(audioData));
+    this.process?.ffmpegProc?.stdin?.write('q');
   }
 
   pauseQueue() {
@@ -46,5 +39,28 @@ module.exports = class PlayerService {
 
   clearQueue() {
     return this.queue.clear();
+  }
+
+  /**
+   * @param {{ volume: number, chatId: string, link: string, command: string }} audioData
+   * @return {Promise}
+   */
+  async play({ link, volume }) {
+    return new Promise((resolve, reject) => {
+      this.process = getFfmpeg(link, volume)
+        .on('codecData', this.updateSpeaker)
+        .on('end', () => {
+          logger.debug('FFmpeg instance ended');
+          this.speaker = new Speaker();
+          resolve();
+        })
+        .on('error', (err) => {
+          logger.error(`FFmpeg error: ${err.message}`);
+          this.speaker = new Speaker();
+          reject();
+        });
+
+      this.process.pipe(this.speaker);
+    });
   }
 };
