@@ -25,6 +25,7 @@ module.exports = class CommandProcessorService {
       'callbackCommand',
       'textCommand',
       'voiceCommand',
+      'audioCommand',
     ];
     return this;
   }

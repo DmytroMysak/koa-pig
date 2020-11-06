@@ -44,17 +44,6 @@ module.exports = class TelegramBot {
     this.bot.context.replyAndTranslate = (message, ctx) => ctx.reply(this.i18n.translate(message, ctx.user.settings.locale));
   }
 
-  // workWithAudio(ctx, data = null) {
-  //   const params = {
-  //     fileId: data ? data.file_id : ctx.message.audio.file_id,
-  //     getFileUrl: () => ctx.telegram.getFileLink(data || ctx.message.audio),
-  //     volume: ctx.user.volume,
-  //     clients: ctx.user.clients,
-  //   };
-  //   return this.serverService.processAudio(params)
-  //     .catch((error) => this.telegramErrorLogging(error, ctx));
-  // }
-  //
   // workWithDocument(ctx) {
   //   if (ctx.message.document.mime_type !== 'audio/mp3') {
   //     return this.sendResponseAndTranslate('no_idea_what_to_do', ctx);
@@ -77,7 +66,6 @@ module.exports = class TelegramBot {
       }
     });
 
-    // this.bot.on('audio', (ctx) => this.workWithAudio(ctx));
     // this.bot.on('document', (ctx) => this.workWithDocument(ctx));
     this.bot.on('message', (ctx) => ctx.replyAndTranslate('no_idea_what_to_do', ctx));
 
