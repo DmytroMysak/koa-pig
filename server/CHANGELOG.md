@@ -1,5 +1,118 @@
-## <small>0.9.2 (2020-11-03)</small>
+## 0.14.0 (2020-11-06)
 
+* feat(server): update localization ([9d440e1](https://github.com/DmytroMysak/koa-pig/commit/9d440e1))
+
+
+
+## 0.13.0 (2020-11-06)
+
+* ci: version bump to v0.13.0 ([204ac77](https://github.com/DmytroMysak/koa-pig/commit/204ac77))
+* ci: version bump to v0.14.0 ([e7a0482](https://github.com/DmytroMysak/koa-pig/commit/e7a0482))
+* feat(server/client): added youtube support + small refactoring ([c3e98a4](https://github.com/DmytroMysak/koa-pig/commit/c3e98a4))
+
+
+
+## <small>0.12.1 (2020-11-06)</small>
+
+* ci: version bump to v0.12.1 ([8b88ff6](https://github.com/DmytroMysak/koa-pig/commit/8b88ff6))
+* ci: version bump to v0.13.1 ([64155e0](https://github.com/DmytroMysak/koa-pig/commit/64155e0))
+* fix(client): fixed error when stop nothing ([c445e9d](https://github.com/DmytroMysak/koa-pig/commit/c445e9d))
+
+
+
+## 0.12.0 (2020-11-06)
+
+* ci: version bump to v0.12.0 ([5883e61](https://github.com/DmytroMysak/koa-pig/commit/5883e61))
+* ci: version bump to v0.13.0 ([9a1c9ff](https://github.com/DmytroMysak/koa-pig/commit/9a1c9ff))
+* ci(ci): fix Heroku Awake action ([87a7d27](https://github.com/DmytroMysak/koa-pig/commit/87a7d27))
+* refactor(server): telegram refactoring ([929f0d7](https://github.com/DmytroMysak/koa-pig/commit/929f0d7))
+* feat(server): added audio support ([a31f10b](https://github.com/DmytroMysak/koa-pig/commit/a31f10b))
+* feat(server/client): added voice support ([005810c](https://github.com/DmytroMysak/koa-pig/commit/005810c))
+
+
+
+## <small>0.11.3 (2020-11-05)</small>
+
+* ci: version bump to v0.11.3 ([8071818](https://github.com/DmytroMysak/koa-pig/commit/8071818))
+* ci: version bump to v0.12.3 ([ea2182b](https://github.com/DmytroMysak/koa-pig/commit/ea2182b))
+* ci(ci): fixed Heroku Awake action ([2f02779](https://github.com/DmytroMysak/koa-pig/commit/2f02779))
+* ci(ci): fixed Heroku Awake action ([3ac306e](https://github.com/DmytroMysak/koa-pig/commit/3ac306e))
+* ci(ci): update ci (heroku wakeup) ([09d9070](https://github.com/DmytroMysak/koa-pig/commit/09d9070))
+
+
+
+## <small>0.11.2 (2020-11-05)</small>
+
+* ci: version bump to v0.11.2 ([eb08452](https://github.com/DmytroMysak/koa-pig/commit/eb08452))
+* ci: version bump to v0.12.2 ([4d8a18c](https://github.com/DmytroMysak/koa-pig/commit/4d8a18c))
+* fix(server): fixed language name ([f50935d](https://github.com/DmytroMysak/koa-pig/commit/f50935d))
+
+
+
+## <small>0.11.1 (2020-11-05)</small>
+
+* ci: version bump to v0.10.2 ([70854ab](https://github.com/DmytroMysak/koa-pig/commit/70854ab))
+* ci: version bump to v0.11.0 ([6fbfc98](https://github.com/DmytroMysak/koa-pig/commit/6fbfc98))
+* ci: version bump to v0.11.1 ([1f1f899](https://github.com/DmytroMysak/koa-pig/commit/1f1f899))
+* ci: version bump to v0.11.2 ([180650b](https://github.com/DmytroMysak/koa-pig/commit/180650b))
+* ci: version bump to v0.12.0 ([37d211a](https://github.com/DmytroMysak/koa-pig/commit/37d211a))
+* ci: version bump to v0.12.1 ([377da72](https://github.com/DmytroMysak/koa-pig/commit/377da72))
+* ci(ci): update deploy ci ([ddc8765](https://github.com/DmytroMysak/koa-pig/commit/ddc8765))
+* ci(fixed ci): fIxed ci ([20d3c59](https://github.com/DmytroMysak/koa-pig/commit/20d3c59))
+* fix(server): fixed language list ([be895e9](https://github.com/DmytroMysak/koa-pig/commit/be895e9))
+* refactor(server): refactor docker-compose ([64362ae](https://github.com/DmytroMysak/koa-pig/commit/64362ae))
+* refactor(server): update config, change local start ([b10f6ab](https://github.com/DmytroMysak/koa-pig/commit/b10f6ab))
+* refactor(server): update configs ([2c3325d](https://github.com/DmytroMysak/koa-pig/commit/2c3325d))
+* feat(ci): added wake up heroku action ([562b2af](https://github.com/DmytroMysak/koa-pig/commit/562b2af))
+
+
+
+## <small>0.10.1 (2020-11-05)</small>
+
+* ci: version bump to v0.10.0 ([4bb49d0](https://github.com/DmytroMysak/koa-pig/commit/4bb49d0))
+* ci: version bump to v0.10.1 ([54f0fa7](https://github.com/DmytroMysak/koa-pig/commit/54f0fa7))
+* ci: version bump to v0.11.1 ([333db9d](https://github.com/DmytroMysak/koa-pig/commit/333db9d))
+* fix(server): fixe ngrock import ([b4e7133](https://github.com/DmytroMysak/koa-pig/commit/b4e7133))
+
+
+
+## 0.11.0 (2020-11-05)
+
+* ci: version bump to v0.11.0 ([721122c](https://github.com/DmytroMysak/koa-pig/commit/721122c))
+* feat(server): update production build ([e5a5555](https://github.com/DmytroMysak/koa-pig/commit/e5a5555))
+
+
+
+## <small>0.9.4 (2020-11-05)</small>
+
+* ci: version bump to v0.9.4 ([1d958f2](https://github.com/DmytroMysak/koa-pig/commit/1d958f2))
+
+
+
+## <small>0.10.2 (2020-11-05)</small>
+
+* ci: version bump to v0.10.1 ([b331f18](https://github.com/DmytroMysak/koa-pig/commit/b331f18))
+* ci: version bump to v0.10.2 ([5ba543d](https://github.com/DmytroMysak/koa-pig/commit/5ba543d))
+* ci: version bump to v0.9.3 ([92f44c6](https://github.com/DmytroMysak/koa-pig/commit/92f44c6))
+* ci(ci): fix ci (2) ([dec2e91](https://github.com/DmytroMysak/koa-pig/commit/dec2e91))
+* ci(ci): fixe ci ([9910ca4](https://github.com/DmytroMysak/koa-pig/commit/9910ca4))
+* ci(ci): update bump version ci ([07bc244](https://github.com/DmytroMysak/koa-pig/commit/07bc244))
+
+
+
+## 0.10.0 (2020-11-05)
+
+* ci: version bump to v0.10.0 ([aad459d](https://github.com/DmytroMysak/koa-pig/commit/aad459d))
+* feat(server): added autodeployment to heroku of server ([f8ac85a](https://github.com/DmytroMysak/koa-pig/commit/f8ac85a))
+* feat(server): update dockerfile, added node.js version ([570b79b](https://github.com/DmytroMysak/koa-pig/commit/570b79b))
+* refactor(server): update google creadential upload ([40a5e4e](https://github.com/DmytroMysak/koa-pig/commit/40a5e4e))
+* docs(changelog): update changelog ([1607cd0](https://github.com/DmytroMysak/koa-pig/commit/1607cd0))
+
+
+
+## <small>0.9.3 (2020-11-03)</small>
+
+* ci: version bump to v0.9.3 ([e1f9a76](https://github.com/DmytroMysak/koa-pig/commit/e1f9a76))
 * fix(server): fixed regex ([073bd09](https://github.com/DmytroMysak/koa-pig/commit/073bd09))
 
 
