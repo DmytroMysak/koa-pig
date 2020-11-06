@@ -44,20 +44,10 @@ module.exports = class TelegramBot {
     this.bot.context.replyAndTranslate = (message, ctx) => ctx.reply(this.i18n.translate(message, ctx.user.settings.locale));
   }
 
-  // workWithDocument(ctx) {
-  //   if (ctx.message.document.mime_type !== 'audio/mp3') {
-  //     return this.sendResponseAndTranslate('no_idea_what_to_do', ctx);
-  //   }
-  //   return this.workWithAudio(ctx, ctx.message.document)
-  //     .catch((error) => this.telegramErrorLogging(error, ctx));
-  // }
-
-  async start() {
-    await this.commandProcessor.initializeCommands();
-    this.extendContext();
-
+  async setBotListeners() {
     this.bot.use((ctx, next) => this.userMiddleware(ctx, next));
 
+    await this.commandProcessor.initializeCommands();
     this.commandProcessor.getCommands().forEach((command) => {
       if (command.name) {
         this.bot[command.type](command.name, ((ctx) => command.execute(ctx)));
@@ -66,9 +56,7 @@ module.exports = class TelegramBot {
       }
     });
 
-    // this.bot.on('document', (ctx) => this.workWithDocument(ctx));
     this.bot.on('message', (ctx) => ctx.replyAndTranslate('no_idea_what_to_do', ctx));
-
     this.bot.catch((error) => {
       if (!error) {
         return;
@@ -78,6 +66,11 @@ module.exports = class TelegramBot {
       }
       logger.error(error);
     });
+  }
+
+  async start() {
+    this.extendContext();
+    await this.setBotListeners();
 
     return this.bot.launch({
       webhook: {

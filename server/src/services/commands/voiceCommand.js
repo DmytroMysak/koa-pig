@@ -1,7 +1,7 @@
 const BaseCommand = require('./baseCommand');
 const clientService = require('../clientService');
 
-module.exports = class TextCommand extends BaseCommand {
+module.exports = class VoiceCommand extends BaseCommand {
   constructor() {
     super();
     this.type = 'on';
