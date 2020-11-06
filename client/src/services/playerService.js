@@ -33,7 +33,7 @@ module.exports = class PlayerService {
   }
 
   stopSong() {
-    this.process.kill('SIGINT');
+    this.process?.kill('SIGINT');
   }
 
   addToQueue(audioData) {
