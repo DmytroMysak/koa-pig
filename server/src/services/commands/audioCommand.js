@@ -14,8 +14,7 @@ module.exports = class AudioCommand extends BaseCommand {
     try {
       link = await ctx.telegram.getFileLink(ctx.update.message.audio.file_id);
     } catch {
-      // TO DO, send error file too big
-      debugger;
+      return this.sendResponseAndTranslate('file_too_big');
     }
 
     return clientService.sendToClients({
