@@ -57,7 +57,7 @@ module.exports = class TextCommand extends BaseCommand {
   }
 
   async sendAudio(text, fileName) {
-    const title = text.length > 23 ? `${text.substring(0, 20)}...` : text;
+    const title = text.length > 53 ? `${text.substring(0, 50)}...` : text;
 
     return this.ctx.replyWithAudio({ url: createFileLink(fileName), filename: title }, {
       performer: 'Little Pig Bot',
