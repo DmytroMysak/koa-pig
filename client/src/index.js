@@ -8,12 +8,8 @@ const main = async () => {
     commandProcessor.initialize(),
     queueService.initialize(),
   ]);
-  try {
-    await queueService.processMessages((data) => commandProcessor.selectCommandAndExecute(data));
-  } catch (error) {
-    logger.error('Looks like pig isn\'t registered. Please register pig first');
-    throw error;
-  }
+
+  await queueService.processMessages((data) => commandProcessor.selectCommandAndExecute(data));
   logger.info('Client started');
 };
 

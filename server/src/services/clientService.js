@@ -11,7 +11,7 @@ module.exports = {
     channel = await connection.createChannel();
     logger.debug('Connected to RabbitMQ');
 
-    await channel.assertQueue(config.amqp.responseQueueName);
+    await channel.assertQueue(config.amqp.responseQueueName, { durable: true });
     await channel.consume(config.amqp.responseQueueName, (msg) => {
       if (!msg) {
         return channel.nack(msg);
