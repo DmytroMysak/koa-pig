@@ -11,6 +11,7 @@ Small pig that play anything that you send to telegram bot
 - [ ] support sound cloud
 - [ ] investigate spotify support
 - [ ] fix bug youtube stop play song before end
+- [ ] move changelog to common folder
 
 ### Install pig by yourself
 - Clone repo
