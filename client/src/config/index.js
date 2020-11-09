@@ -8,7 +8,10 @@ const config = { development, production };
 
 const defaults = {
   logger: {
-    prettyPrint: { translateTime: 'SYS:standard' },
+    prettyPrint: {
+      translateTime: 'SYS:standard',
+      ignore: 'pid,hostname',
+    },
     level: 'debug',
   },
   amqp: {
