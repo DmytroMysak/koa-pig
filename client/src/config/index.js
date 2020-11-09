@@ -8,8 +8,8 @@ const config = { development, production };
 
 const defaults = {
   logger: {
+    prettyPrint: { translateTime: 'SYS:standard' },
     level: 'debug',
-    logsDirectory: '',
   },
   amqp: {
     url: process.env.AMQP_URL,
