@@ -1,0 +1,36 @@
+{
+  "name": "pig",
+  "version": "0.16.0",
+  "description": "pig client and server",
+  "main": "generateChangelog.js",
+  "scripts": {
+    "changelog": "node generateChangelog.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DmytroMysak/koa-pig.git"
+  },
+  "keywords": [
+    "rabbitmq",
+    "server",
+    "client",
+    "eslint",
+    "aws",
+    "google-bucket",
+    "mongoose",
+    "pino",
+    "telegram",
+    "telegraf",
+    "ngrok"
+  ],
+  "author": "Dmytro Mysak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DmytroMysak/koa-pig/issues"
+  },
+  "homepage": "https://github.com/DmytroMysak/koa-pig#readme",
+  "devDependencies": {
+    "conventional-changelog": "^3.1.24",
+    "cz-conventional-changelog": "^3.3.0"
+  }
+}
