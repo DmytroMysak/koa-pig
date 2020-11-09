@@ -14,9 +14,15 @@ module.exports = {
     await channel.assertQueue(config.amqp.responseQueueName, { durable: true });
     await channel.consume(config.amqp.responseQueueName, (msg) => {
       if (!msg) {
-        return channel.nack(msg);
+        return channel.nack(msg, false, false);
       }
-      const response = msg.content.toString();
+      let response;
+      try {
+        response = JSON.parse(msg.content.toString());
+      } catch (error) {
+        logger.error(`Bad response: ${msg.content.toString()}`);
+        return channel.nack(msg, false, false);
+      }
       logger.debug(response);
       if (!telegramInstance) {
         logger.error('No telegram instance to send response');

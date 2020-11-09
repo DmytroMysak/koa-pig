@@ -3,15 +3,18 @@ const BaseCommand = require('./baseCommand');
 const logger = require('../../helper/logger');
 
 module.exports = class PlayYouTubeCommand extends BaseCommand {
-  constructor() {
-    super();
+  constructor(channel) {
+    super(channel);
     this.name = 'play-song-youtube';
   }
 
-  async execute(data) {
-    super.execute(data);
-
-    const info = await ytdl.getInfo(data.link);
+  async execute(message) {
+    let info;
+    try {
+      info = await ytdl.getInfo(message.link);
+    } catch (error) {
+      return this.sendResponse({ message: error.message });
+    }
 
     // audio only, sorted by quality (highest bitrate)
     const [audio] = ytdl.filterFormats(info.formats || [], 'audioonly')
@@ -27,6 +30,7 @@ module.exports = class PlayYouTubeCommand extends BaseCommand {
     //   logger.debug(`Video format: ${video.resolution} [${video.size}] (${video.encoding}) ${video.fps}`);
     // }
 
-    await this.player.addToQueue({ ...data, link: audio.url });
+    await this.player.addToQueue({ ...message, link: audio.url });
+    return this.ack();
   }
 };

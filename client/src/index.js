@@ -1,15 +1,28 @@
+const amqplib = require('amqplib');
+const config = require('./config/index');
 const logger = require('./helper/logger');
 const CommandProcessorService = require('./services/commandProcessorService');
-const queueService = require('./services/amqpService');
 
 const main = async () => {
-  const commandProcessor = new CommandProcessorService();
-  await Promise.all([
-    commandProcessor.initialize(),
-    queueService.initialize(),
-  ]);
+  const connection = await amqplib.connect(config.amqp.url);
+  const channel = await connection.createChannel();
+  logger.debug('Connected to RabbitMQ');
 
-  await queueService.processMessages((data) => commandProcessor.selectCommandAndExecute(data));
+  const commandProcessor = new CommandProcessorService(channel);
+  await commandProcessor.initialize();
+
+  await channel.consume(config.amqp.queueName, (msg) => {
+    if (!msg) {
+      return channel.nack(msg, false, false);
+    }
+
+    return commandProcessor.selectCommandAndExecute(msg)
+      .catch((error) => {
+        logger.error('Unexpected error!');
+        logger.error(error);
+        return channel.nack(msg, false, false);
+      });
+  });
   logger.info('Client started');
 };
 

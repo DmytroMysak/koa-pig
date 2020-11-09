@@ -1,34 +1,44 @@
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
+const logger = require('../helper/logger');
 
 const readDir = promisify(fs.readdir);
 
 module.exports = class CommandProcessorService {
-  constructor() {
+  constructor(channel) {
     if (typeof CommandProcessorService.instance === 'object') {
       return CommandProcessorService.instance;
     }
     CommandProcessorService.instance = this;
     this.commands = new Map();
+    this.channel = channel;
     return this;
   }
 
   addCommand(Command) {
-    const command = new Command();
+    const command = new Command(this.channel);
 
     if (Array.isArray(command.name)) {
-      command.name.forEach((name) => this.commands.set(name, new Command()));
+      command.name.forEach((name) => this.commands.set(name, new Command(this.channel)));
     } else {
       this.commands.set(command.name, command);
     }
   }
 
-  async selectCommandAndExecute(data) {
-    if (!this.commands.has(data.command)) {
+  async selectCommandAndExecute(msg) {
+    const message = JSON.parse(msg.content.toString());
+    if (!message) {
+      throw new Error('Message empty');
+    }
+    logger.debug(`Message from server: ${JSON.stringify(message, null, 2)}`);
+    if (!this.commands.has(message.command)) {
       throw new Error('No such command');
     }
-    return this.commands.get(data.command).execute(data);
+    const command = this.commands.get(message.command);
+    command.msg = msg;
+    command.chatId = message?.chatId;
+    return command.execute(message);
   }
 
   async initialize() {

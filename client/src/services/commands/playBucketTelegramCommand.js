@@ -1,14 +1,13 @@
 const BaseCommand = require('./baseCommand');
 
 module.exports = class PlayBucketSongCommand extends BaseCommand {
-  constructor() {
-    super();
+  constructor(channel) {
+    super(channel);
     this.name = ['play-song-bucket', 'play-song-telegram'];
   }
 
-  async execute(data) {
-    super.execute(data);
-
-    await this.player.addToQueue(data);
+  async execute(message) {
+    await this.player.addToQueue(message);
+    this.ack();
   }
 };

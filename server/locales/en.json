@@ -25,5 +25,6 @@
   "ua": "Ukraine \uD83C\uDDFA\uD83C\uDDE6",
   "manage_clients": "Manage \uD83D\uDC37",
   "sorry_to_big": "Ow... to much text, try send less than 1500 characters please",
-  "file_too_big": "Oww... File too big... Telegram allow to handle bot a file 25Mb or less"
+  "file_too_big": "Oww... File too big... Telegram allow to handle bot a file 25Mb or less",
+  "pig_say": "Pig say:"
 }

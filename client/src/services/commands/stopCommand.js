@@ -1,14 +1,14 @@
 const BaseCommand = require('./baseCommand');
 
 module.exports = class StopCommand extends BaseCommand {
-  constructor() {
-    super();
+  constructor(channel) {
+    super(channel);
     this.name = 'stop-song';
   }
 
-  async execute(data) {
-    super.execute(data);
-
+  // eslint-disable-next-line no-unused-vars
+  async execute(message) {
     this.player.stopSong();
+    this.ack();
   }
 };
