@@ -20,10 +20,18 @@ module.exports = class CommandProcessorService {
     const command = new Command(this.channel);
 
     if (Array.isArray(command.name)) {
-      command.name.forEach((name) => this.commands.set(name, new Command(this.channel)));
+      command.name.forEach((name) => this.commands.set(name, Command));
     } else {
-      this.commands.set(command.name, command);
+      this.commands.set(command.name, Command);
     }
+  }
+
+  getCommand(name) {
+    if (!this.commands.has(name)) {
+      throw new Error('No such command');
+    }
+    const Command = this.commands.get(name);
+    return new Command(this.channel);
   }
 
   async selectCommandAndExecute(msg) {
@@ -32,10 +40,8 @@ module.exports = class CommandProcessorService {
       throw new Error('Message empty');
     }
     logger.debug(`Message from server: ${JSON.stringify(message, null, 2)}`);
-    if (!this.commands.has(message.command)) {
-      throw new Error('No such command');
-    }
-    const command = this.commands.get(message.command);
+
+    const command = this.getCommand(message.command);
     command.msg = msg;
     command.chatId = message?.chatId;
     return command.execute(message);

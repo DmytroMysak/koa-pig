@@ -10,8 +10,7 @@
   "license": "MIT",
   "scripts": {
     "start": "cross-env NODE_ENV=development node src/index.js",
-    "start:prod": "cross-env NODE_ENV=production node src/index.js",
-    "commit": "git cz"
+    "start:prod": "cross-env NODE_ENV=production node src/index.js"
   },
   "engines": {
     "node": "14.x"
@@ -35,27 +34,5 @@
     "eslint-plugin-import": "^2.22.1",
     "ngrok": "^3.3.0"
   },
-  "config": {
-    "commitizen": {
-      "path": "./server/node_modules/cz-conventional-changelog"
-    }
-  },
-  "description": "Manage command from little pig bot",
-  "bugs": {
-    "url": "https://github.com/DmytroMysak/koa-pig/issues"
-  },
-  "homepage": "https://github.com/DmytroMysak/koa-pig#readme",
-  "keywords": [
-    "rabbitmq",
-    "server",
-    "client",
-    "eslint",
-    "aws",
-    "google-bucket",
-    "mongoose",
-    "pino",
-    "telgram",
-    "telegraf",
-    "ngrok"
-  ]
+  "description": "Manage command from little pig bot"
 }

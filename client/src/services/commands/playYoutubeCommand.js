@@ -13,6 +13,7 @@ module.exports = class PlayYouTubeCommand extends BaseCommand {
     try {
       info = await ytdl.getInfo(message.link);
     } catch (error) {
+      logger.error(error);
       return this.sendResponse({ message: error.message });
     }
 

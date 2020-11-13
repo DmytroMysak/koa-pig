@@ -11,9 +11,10 @@ Small pig that play anything that you send to telegram bot
 - [ ] default volume to 50
 - [ ] support sound cloud
 - [ ] investigate spotify support
-- [ ] fix bug youtube stop play song before end
+- [x] fix bug youtube stop play song before end
 - [x] move changelog to common folder
 - [ ] add translation to pig response
+- [x] log ytdl-core errors
 
 ### Install pig by yourself
 - Clone repo

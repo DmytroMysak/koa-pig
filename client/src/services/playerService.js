@@ -47,20 +47,15 @@ module.exports = class PlayerService {
    */
   async play({ link, volume }) {
     return new Promise((resolve, reject) => {
-      this.process = getFfmpeg(link, volume)
-        .on('codecData', this.updateSpeaker)
-        .on('end', () => {
-          logger.debug('FFmpeg instance ended');
-          this.speaker = new Speaker();
-          resolve();
-        })
-        .on('error', (err) => {
-          logger.error(`FFmpeg error: ${err.message}`);
-          this.speaker = new Speaker();
-          reject();
-        });
-
-      this.process.pipe(this.speaker);
+      this.speaker = new Speaker();
+      this.process = getFfmpeg(link, volume).on('codecData', this.updateSpeaker);
+      try {
+        this.process.pipe(this.speaker);
+      } catch (e) {
+        this.speaker.close(false);
+      }
+      this.speaker.on('close', (() => resolve()));
+      this.speaker.on('error', (() => reject()));
     });
   }
 };
