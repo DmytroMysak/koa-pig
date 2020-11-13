@@ -25,6 +25,7 @@ jobs:
         uses: 'phips28/gh-action-bump-version@v8.0.12'
         with:
           PACKAGEJSON_DIR: 'client'
+          skip-tag: 'true'
         env:
           PACKAGEJSON_DIR: 'client'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
