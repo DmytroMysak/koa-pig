@@ -8,7 +8,7 @@ Small pig that play anything that you send to telegram bot
 - [ ] add a stop all command (rename stop command to next command)
 - [ ] add play previous command (up to 100 previous song)
 - [x] send quiet response
-- [ ] default volume to 50
+- [x] default volume to 50
 - [ ] support sound cloud
 - [ ] investigate spotify support
 - [x] fix bug youtube stop play song before end

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const settingSchema = new mongoose.Schema({
   volume: {
     type: Number,
-    default: 100,
+    default: 50,
     min: 1,
     max: 100,
   },
@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema({
     type: settingSchema,
     required: true,
     default: () => ({
-      volume: 100,
+      volume: 50,
       locale: 'ua',
       voiceId: 'Maxim',
     }),
