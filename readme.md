@@ -7,7 +7,7 @@ Small pig that play anything that you send to telegram bot
 - [ ] finish pig-config commands
 - [ ] add a stop all command (rename stop command to next command)
 - [ ] add play previous command (up to 100 previous song)
-- [ ] send quiet response
+- [x] send quiet response
 - [ ] default volume to 50
 - [ ] support sound cloud
 - [ ] investigate spotify support

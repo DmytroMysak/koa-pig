@@ -24,14 +24,14 @@ module.exports = class BaseCommand {
     return text;
   }
 
-  sendResponseAndTranslate(input, ...args) {
+  sendResponseAndTranslate(input, extra = {}) {
     if (this.ctx.updateType === 'callback_query') {
       return Promise.all([
         this.ctx.answerCbQuery(this.translate(input)),
-        this.ctx.reply(this.translate(input), ...args),
+        this.ctx.reply(this.translate(input), { disable_notification: true, ...extra }),
       ]);
     }
-    return this.ctx.reply(this.translate(input), ...args);
+    return this.ctx.reply(this.translate(input), { disable_notification: true, ...extra });
   }
 
   // eslint-disable-next-line class-methods-use-this
