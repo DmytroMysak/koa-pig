@@ -18,6 +18,7 @@ Additional
 - [x] log ytdl-core errors
 - [ ] fix 429 youtube error
 - [ ] show current state (language, voice, volume)
+- [x] change voice list from 2 to 4
 
 ### Goals for v2
 - [ ] add a stop all command (rename stop command to next command)

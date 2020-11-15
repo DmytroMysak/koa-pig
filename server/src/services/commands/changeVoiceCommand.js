@@ -18,7 +18,7 @@ module.exports = class ChangeVoiceCommand extends BaseCommand {
 
     return this.sendResponseAndTranslate(
       'voice_list',
-      Markup.inlineKeyboard(languageListButton, { columns: 2 }).extra(),
+      Markup.inlineKeyboard(languageListButton, { columns: 4 }).extra(),
     );
   }
 };
