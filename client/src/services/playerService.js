@@ -1,6 +1,5 @@
 const { default: PQueue } = require('p-queue');
 const Speaker = require('speaker');
-const logger = require('../helper/logger');
 const { getFfmpeg } = require('../helper/util');
 
 module.exports = class PlayerService {

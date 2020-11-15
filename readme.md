@@ -10,7 +10,6 @@ Additional
 - [X] fix unexpected error (prevent loop)
 - [x] send quiet response
 - [x] default volume to 50
-- [ ] support sound cloud
 - [ ] investigate spotify support
 - [x] fix bug youtube stop play song before end
 - [x] move changelog to common folder
@@ -24,6 +23,7 @@ Additional
 - [ ] add a stop all command (rename stop command to next command)
 - [ ] add play previous command (up to 100 previous song)
 - [ ] current play
+- [ ] support sound cloud
 
 ### Install pig by yourself
 - Clone repo
