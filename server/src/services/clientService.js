@@ -28,7 +28,7 @@ module.exports = {
         logger.error('No telegram instance to send response');
         return channel.nack(msg);
       }
-      telegramInstance.sendMessage(response.chatId, response.message);
+      telegramInstance.sendMessage(response.chatId, response.message, { disable_notification: true });
       return channel.ack(msg);
     });
   },

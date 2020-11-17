@@ -19,6 +19,7 @@ const defaults = {
     responseQueueName: 'response-queue',
     queueName: process.env.SECRET_KEY,
   },
+  youtubeCookie: process.env.YOUTUBE_COOKIE,
 };
 
 module.exports = { ...defaults, ...(config[env] || config.development) };

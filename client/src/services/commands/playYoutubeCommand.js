@@ -1,6 +1,7 @@
 const ytdl = require('ytdl-core');
 const BaseCommand = require('./baseCommand');
 const logger = require('../../helper/logger');
+const config = require('../../config/index');
 
 module.exports = class PlayYouTubeCommand extends BaseCommand {
   constructor(channel) {
@@ -11,7 +12,7 @@ module.exports = class PlayYouTubeCommand extends BaseCommand {
   async execute(message) {
     let info;
     try {
-      info = await ytdl.getInfo(message.link);
+      info = await ytdl.getInfo(message.link, { requestOptions: { headers: { Cookie: config.youtubeCookie } } });
     } catch (error) {
       logger.error(error);
       return this.sendResponse({ message: error.message });
