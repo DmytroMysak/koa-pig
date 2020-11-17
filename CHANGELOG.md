@@ -1,5 +1,63 @@
+## <small>0.17.1 (2020-11-17)</small>
+
+* ci: version bump to v0.17.1 ([07aebbb](https://github.com/DmytroMysak/koa-pig/commit/07aebbb))
+* ci: version bump to v0.17.1 ([7c9b43a](https://github.com/DmytroMysak/koa-pig/commit/7c9b43a))
+* ci: version bump to v0.17.1 ([a95d113](https://github.com/DmytroMysak/koa-pig/commit/a95d113))
+* fix(client): fix 429 youtube error ([c0c6d36](https://github.com/DmytroMysak/koa-pig/commit/c0c6d36))
+
+
+
+## 0.17.0 (2020-11-15)
+
+* ci: version bump to v0.16.1 ([f41a768](https://github.com/DmytroMysak/koa-pig/commit/f41a768))
+* ci: version bump to v0.16.2 ([c9d518f](https://github.com/DmytroMysak/koa-pig/commit/c9d518f))
+* ci: version bump to v0.16.3 ([3e3b4a6](https://github.com/DmytroMysak/koa-pig/commit/3e3b4a6))
+* ci: version bump to v0.17.0 ([a16fabb](https://github.com/DmytroMysak/koa-pig/commit/a16fabb))
+* ci: version bump to v0.17.0 ([6bc40d8](https://github.com/DmytroMysak/koa-pig/commit/6bc40d8))
+* ci: version bump to v0.17.0 ([d376ad0](https://github.com/DmytroMysak/koa-pig/commit/d376ad0))
+* ci(ci): fix ci ([1879ee2](https://github.com/DmytroMysak/koa-pig/commit/1879ee2))
+* docs(readme): update readme ([33c2327](https://github.com/DmytroMysak/koa-pig/commit/33c2327))
+* docs(readme): update readme ([9f4d276](https://github.com/DmytroMysak/koa-pig/commit/9f4d276))
+* feat(server): change voice list from 2 to 4 ([19cc1c1](https://github.com/DmytroMysak/koa-pig/commit/19cc1c1))
+* feat(server): default volume to 50 ([92610d8](https://github.com/DmytroMysak/koa-pig/commit/92610d8))
+* feat(server): send quiet response ([a442806](https://github.com/DmytroMysak/koa-pig/commit/a442806))
+
+
+
+## <small>0.16.1 (2020-11-13)</small>
+
+* ci: version bump to v0.16.1 ([9a181d5](https://github.com/DmytroMysak/koa-pig/commit/9a181d5))
+* ci: version bump to v0.16.2 ([864b4ee](https://github.com/DmytroMysak/koa-pig/commit/864b4ee))
+* fix(client): fix bug youtube stop play song before end, log ytdl-core errors ([3e9a2b9](https://github.com/DmytroMysak/koa-pig/commit/3e9a2b9))
+* docs(client/server): move changelog to common folder ([c477337](https://github.com/DmytroMysak/koa-pig/commit/c477337))
+* refactor(client): skip pid,hostname in logs ([5cb2d5d](https://github.com/DmytroMysak/koa-pig/commit/5cb2d5d))
+* refactor(client): update client logger config ([9d47591](https://github.com/DmytroMysak/koa-pig/commit/9d47591))
+
+
+
+## <small>0.15.1 (2020-11-09)</small>
+
+* ci: version bump to v0.15.1 ([ce9e382](https://github.com/DmytroMysak/koa-pig/commit/ce9e382))
+* ci: version bump to v0.16.1 ([c0492ad](https://github.com/DmytroMysak/koa-pig/commit/c0492ad))
+* fix(client): fix handdle unexpected error on client ([e993422](https://github.com/DmytroMysak/koa-pig/commit/e993422))
+* docs(readme): create general readme ([ece6da3](https://github.com/DmytroMysak/koa-pig/commit/ece6da3))
+* docs(readme): upadate readme ([8884255](https://github.com/DmytroMysak/koa-pig/commit/8884255))
+
+
+
+## 0.15.0 (2020-11-07)
+
+* ci: version bump to v0.15.0 ([77c72c1](https://github.com/DmytroMysak/koa-pig/commit/77c72c1))
+* ci: version bump to v0.16.0 ([7b31095](https://github.com/DmytroMysak/koa-pig/commit/7b31095))
+* feat(server): increase song name to 50 characters ([0492226](https://github.com/DmytroMysak/koa-pig/commit/0492226))
+* docs(changelog): update changelog ([9959499](https://github.com/DmytroMysak/koa-pig/commit/9959499))
+
+
+
 ## 0.14.0 (2020-11-06)
 
+* ci: version bump to v0.14.0 ([23508c9](https://github.com/DmytroMysak/koa-pig/commit/23508c9))
+* ci: version bump to v0.15.0 ([029ad64](https://github.com/DmytroMysak/koa-pig/commit/029ad64))
 * feat(server): update localization ([9d440e1](https://github.com/DmytroMysak/koa-pig/commit/9d440e1))
 
 

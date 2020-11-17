@@ -18,7 +18,7 @@ const main = async () => {
 
     return commandProcessor.selectCommandAndExecute(msg)
       .catch((error) => {
-        logger.error('Unexpected error!');
+        logger.error('Unexpected error during command execution:');
         logger.error(error);
         return channel.nack(msg, false, false);
       });
