@@ -1,6 +1,6 @@
 const { Markup } = require('telegraf');
 const BaseCommand = require('./baseCommand');
-const SelectedVoiceCommand = require('./selectedVoiceCommand');
+const SelectedStateCommand = require('./selectedStateCommand');
 const ChangeVoiceCommand = require('./changeVoiceCommand');
 const MenuCommand = require('./menuCommand');
 const voiceService = require('../voiceService');
@@ -16,7 +16,7 @@ module.exports = class CallbackCommand extends BaseCommand {
     super.execute(ctx);
 
     if (ctx.callbackQuery.data === '/selected') {
-      return new SelectedVoiceCommand().execute(ctx);
+      return new SelectedStateCommand().execute(ctx);
     }
     if (ctx.callbackQuery.data === '/changeVoice') {
       return new ChangeVoiceCommand().execute(ctx);

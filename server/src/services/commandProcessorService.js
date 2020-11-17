@@ -16,7 +16,7 @@ module.exports = class CommandProcessorService {
       'helpCommand',
       'menuCommand',
       'changeVoiceCommand',
-      'selectedVoiceCommand',
+      'selectedStateCommand',
       'changeLocaleCommand',
 
       'stopAudioCommand',

@@ -17,7 +17,7 @@ module.exports = class MenuCommand extends BaseCommand {
 
   // TODO refactor
   getMenu(ctx) {
-    const selectedVoiceText = this.i18n.translate('selected_voice', ctx.user.settings.locale);
+    const selectedVoiceText = this.i18n.translate('selected_state', ctx.user.settings.locale);
     const changeVoiceText = this.i18n.translate('change_voice', ctx.user.settings.locale);
     const changeLanguageText = this.i18n.translate('language', ctx.user.settings.locale);
     const manageClientsText = this.i18n.translate('manage_clients', ctx.user.settings.locale);

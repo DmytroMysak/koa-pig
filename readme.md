@@ -14,7 +14,7 @@ Additional
 - [ ] add translation to pig response
 - [x] log ytdl-core errors
 - [x] fix 429 youtube error
-- [ ] show current state (language, voice, volume)
+- [x] show current state (language, voice, volume)
 - [x] change voice list from 2 to 4
 - [ ] merge an automatic bump + changelog generation
 
