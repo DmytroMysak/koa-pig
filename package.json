@@ -1,6 +1,6 @@
 {
   "name": "pig",
-  "version": "0.17.1",
+  "version": "0.18.0",
   "description": "pig client and server",
   "main": "generateChangelog.js",
   "scripts": {
