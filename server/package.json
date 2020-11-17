@@ -1,6 +1,6 @@
 {
   "name": "pig-server",
-  "version": "0.16.3",
+  "version": "0.17.0",
   "main": "src/index.js",
   "repository": {
     "type": "git",
