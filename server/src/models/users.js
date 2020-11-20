@@ -71,12 +71,22 @@ const userSchema = new mongoose.Schema({
     enum: ['admin', 'user'],
     default: 'user',
   },
-  clients: [clientSchema],
+  clients: {
+    type: [clientSchema],
+    required: true,
+    default: () => ({
+      _id: mongoose.Types.ObjectId('00000000000000000000000a'),
+      type: 'public',
+      accessKey: 'some-random-text',
+      name: 'Dmytro\'s home pig',
+    }),
+  },
   selectedClients: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'clients',
     }],
+    default: mongoose.Types.ObjectId('00000000000000000000000a'),
   },
 }, {
   timestamps: true,
