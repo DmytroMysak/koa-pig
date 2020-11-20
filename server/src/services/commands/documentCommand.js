@@ -20,6 +20,6 @@ module.exports = class DocumentCommand extends BaseCommand {
       chatId: ctx.chat.id,
       link,
       command: 'play-song-telegram',
-    }, ctx.user.selectedClients);
+    }, ctx.user);
   }
 };

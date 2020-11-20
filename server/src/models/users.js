@@ -17,6 +17,8 @@ const settingSchema = new mongoose.Schema({
     default: 'Maxim',
     max: 100,
   },
+}, {
+  virtual: true,
 });
 
 const clientSchema = new mongoose.Schema({
@@ -32,6 +34,11 @@ const clientSchema = new mongoose.Schema({
     type: String,
     max: 100,
   },
+  addedBy: {
+    type: String,
+  },
+}, {
+  virtual: true,
 });
 
 const userSchema = new mongoose.Schema({
@@ -65,9 +72,22 @@ const userSchema = new mongoose.Schema({
     default: 'user',
   },
   clients: [clientSchema],
-  selectedClients: [clientSchema],
+  selectedClients: {
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'clients',
+    }],
+  },
 }, {
   timestamps: true,
+  virtual: true,
+});
+
+[settingSchema, clientSchema, userSchema].forEach((schema) => {
+  schema.virtual('id').get(function () { // eslint-disable-line func-names
+    return this._id.toString(); // eslint-disable-line no-underscore-dangle
+  });
+  schema.set('toJSON', { getters: true, virtuals: true });
 });
 
 userSchema.index({ telegramId: 1 });

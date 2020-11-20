@@ -3,7 +3,7 @@ Small pig that play anything that you send to telegram bot
 
 ### Goals before release version 1
 Main
-- [ ] finish pig-config commands
+- [x] finish pig-config commands
 
 Additional
 - [X] fix unexpected error (prevent loop)
@@ -17,6 +17,8 @@ Additional
 - [x] show current state (language, voice, volume)
 - [x] change voice list from 2 to 4
 - [ ] merge an automatic bump + changelog generation
+- [ ] fix _id/id issue in monggose
+- [ ] use static for command name
 
 ### Goals for v2
 - [ ] add a stop all command (rename stop command to next command)

@@ -25,16 +25,17 @@ module.exports = class TelegramBot {
     }
     const { username, first_name: firstName, last_name: lastName, id: telegramId } = ctx.from;
     // TODO temp solution for testing
-    const clients = [{ accessKey: 'some-random-text', type: 'public', name: 'home-pig' }];
-    const selectedClients = [{ accessKey: 'some-random-text', type: 'public', name: 'home-pig' }];
+    // const clients = [{ accessKey: 'some-random-text', type: 'public', name: 'home-pig' }];
+    // const selectedClients = [{ accessKey: 'some-random-text', type: 'public', name: 'home-pig' }];
     try {
       ctx.user = (await User.findOneAndUpdate(
         { telegramId: telegramId.toString() },
-        { telegramId: telegramId.toString(), username, firstName, lastName, clients, selectedClients },
+        { telegramId: telegramId.toString(), username, firstName, lastName },
         { upsert: true, setDefaultsOnInsert: true, new: true },
       )).toJSON();
+      ctx.user.selectedClients = ctx.user.selectedClients.map((id) => id.toString());
     } catch (error) {
-      ctx.reply(this.i18n.translate('unexpected_error', ctx.user.settings.locale));
+      ctx.reply(this.i18n.translate('unexpected_error'));
       next(error);
     }
     next();

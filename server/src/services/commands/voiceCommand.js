@@ -17,6 +17,6 @@ module.exports = class VoiceCommand extends BaseCommand {
       chatId: ctx.chat.id,
       link,
       command: 'play-song-telegram',
-    }, ctx.user.selectedClients);
+    }, ctx.user);
   }
 };

@@ -34,7 +34,7 @@ module.exports = class TextCommand extends BaseCommand {
       chatId: this.ctx.chat.id,
       link: text,
       command: 'play-song-youtube',
-    }, this.ctx.user.selectedClients);
+    }, this.ctx.user);
   }
 
   async processText(txt) {
@@ -56,7 +56,7 @@ module.exports = class TextCommand extends BaseCommand {
         chatId: this.ctx.chat.id,
         link: createFileLink(fileName),
         command: 'play-song-bucket',
-      }, this.ctx.user.selectedClients),
+      }, this.ctx.user),
     ]);
   }
 

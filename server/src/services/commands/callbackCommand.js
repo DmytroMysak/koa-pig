@@ -1,4 +1,6 @@
+const _ = require('lodash');
 const { Markup } = require('telegraf');
+const User = require('../../models/users');
 const BaseCommand = require('./baseCommand');
 const SelectedStateCommand = require('./selectedStateCommand');
 const ChangeVoiceCommand = require('./changeVoiceCommand');
@@ -21,6 +23,18 @@ module.exports = class CallbackCommand extends BaseCommand {
     if (ctx.callbackQuery.data === '/changeVoice') {
       return new ChangeVoiceCommand().execute(ctx);
     }
+    if (ctx.callbackQuery.data === this.clientAddPrefix) {
+      return this.sendResponseAndTranslate('add_new_pig_instruction');
+    }
+    if (ctx.callbackQuery.data === this.clientFindPrivatePrefix) {
+      return this.sendResponseAndTranslate('find_private_pig_instruction');
+    }
+    if (ctx.callbackQuery.data === this.clientFindPublicPrefix) {
+      return this.findPublicClient(ctx);
+    }
+    if (ctx.callbackQuery.data.startsWith(this.clientTogglePrefix)) {
+      return this.updateClient(ctx);
+    }
     if (ctx.callbackQuery.data.startsWith(this.voiceChangePrefix)) {
       return this.changeVoice(ctx);
     }
@@ -33,11 +47,47 @@ module.exports = class CallbackCommand extends BaseCommand {
     return this.sendResponseAndTranslate('no_idea_what_to_do');
   }
 
+  async updateClient(ctx) {
+    const clientId = ctx.callbackQuery.data.replace(this.clientTogglePrefix, '');
+    const { clients } = ctx.user;
+
+    if (!ctx.user.clients.find((el) => el.id === clientId)) {
+      const client = (await User.findOne({ 'clients._id': clientId }).select('clients')).clients.find((el) => el.id === clientId);
+      if (!client) {
+        return this.sendResponseAndTranslate('not_found');
+      }
+      clients.push(client);
+    }
+    const selectedClients = ctx.user.selectedClients.includes(clientId)
+      ? ctx.user.selectedClients.filter((id) => id !== clientId)
+      : [...ctx.user.selectedClients, clientId];
+
+    await this.updateUser(ctx, { selectedClients, clients });
+    return this.sendResponseAndTranslate('done');
+  }
+
+  async findPublicClient(ctx) {
+    const userAvailableClients = ctx.user.clients.map((client) => client.id);
+    const publicClients = (await User.find({ 'clients.type': 'public' }).select('clients'))
+      .flatMap((user) => user.toJSON()?.clients)
+      .filter((client) => client.type === 'public' && !userAvailableClients.includes(client.id))
+      .sort((a, b) => b.name - a.name)
+      .map((client) => Markup.callbackButton(`${client.name} 💤`, `${this.clientTogglePrefix}${client.id}`));
+
+    if (_.isEmpty(publicClients)) {
+      return this.sendResponseAndTranslate('no_pigs');
+    }
+    return this.sendResponseAndTranslate(
+      'pig_list',
+      Markup.inlineKeyboard(publicClients, { columns: 1 }).extra(),
+    );
+  }
+
   async changeVoice(ctx) {
     const voiceId = ctx.callbackQuery.data.replace(this.voiceChangePrefix, '');
     await this.updateUser(ctx, { 'settings.voiceId': voiceId });
 
-    return this.sendResponseAndTranslate('voice_changed');
+    return this.sendResponseAndTranslate('done');
   }
 
   async changeLanguage(ctx) {
@@ -59,6 +109,6 @@ module.exports = class CallbackCommand extends BaseCommand {
     await this.updateUser(ctx, { 'settings.locale': locale });
     const menu = new MenuCommand().getMenu(ctx);
 
-    return this.sendResponseAndTranslate('localization_changed', menu);
+    return this.sendResponseAndTranslate('done', menu);
   }
 };

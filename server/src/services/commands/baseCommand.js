@@ -7,6 +7,10 @@ module.exports = class BaseCommand {
     this.voiceChangePrefix = 'voiceChange_';
     this.languageChangePrefix = 'languageChange_';
     this.localeChangePrefix = 'localeChange_';
+    this.clientAddPrefix = 'clientAdd';
+    this.clientFindPrivatePrefix = 'clientFindPrivatePrefix';
+    this.clientFindPublicPrefix = 'clientFindPublicPrefix';
+    this.clientTogglePrefix = 'clientToggle_';
   }
 
   translate(input) {
@@ -39,7 +43,7 @@ module.exports = class BaseCommand {
     ctx.user = (await User.findOneAndUpdate(
       { telegramId: ctx.user.telegramId },
       update,
-      { upsert: true, setDefaultsOnInsert: true, new: true },
+      { upsert: true, setDefaultsOnInsert: true, new: true, runValidators: true },
     )).toJSON();
   }
 

@@ -7,7 +7,6 @@ module.exports = class UserVolumeCommand extends BaseCommand {
     this.type = 'command';
   }
 
-  // eslint-disable-next-line consistent-return
   async execute(ctx) {
     super.execute(ctx);
 

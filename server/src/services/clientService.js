@@ -35,7 +35,10 @@ module.exports = {
   setTelegramInstance: (telegram) => {
     telegramInstance = telegram;
   },
-  sendToClients: async (object, clients) => {
+  sendToClients: async (object, user) => {
+    const clients = user.selectedClients
+      .map((clientId) => user.clients.find((el) => el.id.toString() === clientId.toString()));
+
     logger.debug(`Sending to clients: [${clients.map((cl) => cl.name).join(', ')}]`);
     logger.debug(object);
 

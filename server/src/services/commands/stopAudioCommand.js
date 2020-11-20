@@ -11,6 +11,6 @@ module.exports = class StopAudioCommand extends BaseCommand {
   async execute(ctx) {
     super.execute(ctx);
 
-    return ClientService.sendToClients({ command: 'stop-song' }, ctx.user.selectedClients);
+    return ClientService.sendToClients({ command: 'stop-song' }, ctx.user);
   }
 };
