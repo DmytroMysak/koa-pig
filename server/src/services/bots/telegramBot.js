@@ -56,6 +56,7 @@ module.exports = class TelegramBot {
       }
     });
 
+    this.bot.on('new_chat_members', (ctx) => ctx.replyAndTranslate('hello_msg', ctx));
     this.bot.on('message', (ctx) => ctx.replyAndTranslate('no_idea_what_to_do', ctx));
     this.bot.catch((error) => {
       if (!error) {

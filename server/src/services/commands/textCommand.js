@@ -9,7 +9,7 @@ module.exports = class TextCommand extends BaseCommand {
   constructor() {
     super();
     this.type = 'on';
-    this.name = 'text';
+    this.name = ['text', 'mention'];
   }
 
   async execute(ctx) {
@@ -37,7 +37,11 @@ module.exports = class TextCommand extends BaseCommand {
     }, this.ctx.user.selectedClients);
   }
 
-  async processText(text) {
+  async processText(txt) {
+    let text = txt;
+    if (text.startsWith('/') && text.includes('@LittlePigBot')) {
+      text = text.replace('/', '').replace('@LittlePigBot', '');
+    }
     const fileName = createFileName(text, this.ctx.user.settings.voiceId);
 
     if (!(await bucketService.isExistFile(fileName))) {
